@@ -522,6 +522,13 @@ tr:hover td{background:var(--warm-light);}
 #rtToast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--petrol);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 18px;box-shadow:0 6px 18px rgba(14,59,54,.3);opacity:0;transition:.25s;z-index:2147480000;pointer-events:none;}
 #rtToast.ver{opacity:1;transform:translateX(-50%) translateY(0);}
 /* ===== v2 · más vida ===== */
+.cal{border:0;border-radius:10px;overflow:hidden;background:#DCE5E2;gap:1px;}
+.cal .dn{background:#0E3B36;color:#fff;border:0;padding:9px 6px;font-size:11px;letter-spacing:.8px;}
+.cal .dn.fin{background:#12463F;color:#B9CFC9;}
+.cal .d{border:0;background:#F6FAF8;}
+.cal .d.fin{background:#EEF5F2;}
+.cal .d.fuera{background:#E7EEEB;}
+.cal .d:hover{background:#FFFFFF;}
 .chip{background:var(--t);border-color:var(--c);color:#24332F;transition:.15s;}
 .chip:hover{box-shadow:0 2px 6px rgba(14,59,54,.12);transform:translateY(-1px);}
 .chip.off{background:#fff;border-color:var(--warm);opacity:.5;text-decoration:line-through;}
@@ -543,8 +550,6 @@ tr:hover td{background:var(--warm-light);}
 .pulsoeje{display:flex;gap:3px;padding:0 2px;margin-bottom:12px;}
 .pulsoeje span{flex:1;text-align:center;font-size:9.5px;color:#9AAAA5;min-width:0;}
 .cal .d{transition:background .15s;}
-.cal .d.fin{background:#FAFCFB;}
-.cal .dn.fin{background:#EAF1EE;}
 .cal .d .n{font-size:13.5px;}
 .cal .d .tot{float:right;font-size:10px;font-weight:700;color:var(--sage-dark);background:#E7F4EF;border-radius:20px;padding:1px 7px;margin-top:2px;}
 .cal .pl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;line-height:1.25;margin-top:3px;padding:2px 7px;border-radius:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -674,7 +679,7 @@ tr:hover td{background:var(--warm-light);}
       <span class="tira volumen"></span>
       <div class="pt" id="calTit">Calendario</div>
       <div class="ph" id="calSub"></div>
-      <div class="ley" id="ley"></div>
+      <div class="ley" id="ley" style="display:none"></div>
       <div id="calCuerpo"></div>
     </div>
     <div class="panel col4" id="pDia">
@@ -820,7 +825,7 @@ function pintarMes(){
   $('pCal').className='panel col8';$('pDia').style.display='';
   $('calTit').textContent='Calendario de '+MESES[S.m].toLowerCase()+' '+S.y;
   var nOps={};S.ev.forEach(function(e){if(e.clase!=='mes')nOps[e.op]=1;});
-  $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'Arriba, la actividad registrada de cada día. En cada día: cuántas OPs distintas tienen registro (color lleno) o programa (borde punteado) en cada etapa.')+
+  $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'En cada día: cuántas OPs distintas tienen registro (color lleno) o programa (borde punteado) en cada etapa.')+
     (filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' '+fmt(Object.keys(nOps).length)+' OPs en el mes. Toca un día para ver el detalle.';
   leyenda();
   var ini=new Date(S.y,S.m,1),off=(ini.getDay()+6)%7,dias=new Date(S.y,S.m+1,0).getDate();
@@ -831,7 +836,7 @@ function pintarMes(){
     var segs=ETAPAS.map(function(E){return [E,g2[E.k]?Object.keys(g2[E.k]).length:0];}).filter(function(x){return x[1];}),sm=segs.reduce(function(a,x){return a+x[1];},0);
     if(sm>mxP)mxP=sm;pul.push([kq,segs,sm]);}
   var pulso='';
-  if(mxP&&!unaOP()){
+  if(false){
     pulso='<div class="pulso" title="OPs con registro real por día">'+pul.map(function(x){return '<div class="pb'+(x[0]===S.sel?' sel':'')+(x[0]===HOY?' hoyb':'')+'" data-d="'+x[0]+'" title="'+esc(fLarga(x[0])+': '+x[2]+' (OPs con registro real, por etapa)')+'">'+
       x[1].map(function(s2){return '<span style="height:'+(s2[1]/mxP*100).toFixed(1)+'%;background:'+s2[0].c+'"></span>';}).join('')+'</div>';}).join('')+'</div>'+
       '<div class="pulsoeje">'+pul.map(function(x,i){var dd=i+1;return '<span>'+((dd===1||dd%5===0||dd===dias)?dd:'')+'</span>';}).join('')+'</div>';
@@ -843,7 +848,7 @@ function pintarMes(){
     var opsD={};ev.forEach(function(e){opsD[e.op]=1;});var nD=Object.keys(opsD).length;
     h+='<div class="'+cls+'" data-d="'+k+'" role="button" tabindex="0" aria-label="'+esc(fLarga(k))+'"><span class="n">'+d.getDate()+'</span>'+(nD&&!unaOP()?'<span class="tot" title="OPs distintas este día">'+nD+' OP</span>':'')+celda(ev)+'</div>';
   }
-  $('calCuerpo').innerHTML=pulso+'<div class="cal">'+h+'</div>';
+  $('calCuerpo').innerHTML='<div class="cal">'+h+'</div>';
 }
 function celda(ev){
   if(!ev.length)return '';
