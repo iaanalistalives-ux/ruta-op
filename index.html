@@ -731,7 +731,7 @@ function etapasOn(){return ETAPAS.filter(function(e){return !S.off[e.k];}).map(f
 function rgba(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';}
 function oscuro(h){var n=parseInt(h.slice(1),16),f=.62;return 'rgb('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','+Math.round((n&255)*f)+')';}
 var DSEM=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-function contar(el){var fin=+el.dataset.n,t0=performance.now();if(!isFinite(fin))return;
+function contar(el){var fin=+el.dataset.n,t0=performance.now();if(!isFinite(fin))return;setTimeout(function(){el.textContent=fmt(fin);},900);if(document.hidden){el.textContent=fmt(fin);return;}
   (function paso(t){var k=Math.min((t-t0)/800,1),e=1-Math.pow(1-k,3);el.textContent=fmt(fin*e);if(k<1)requestAnimationFrame(paso);})(t0);}
 function toast(t){var x=$('rtToast');x.textContent=t;x.classList.add('ver');clearTimeout(toast._t);toast._t=setTimeout(function(){x.classList.remove('ver');},2200);}
 
@@ -794,17 +794,17 @@ function pintarKpis(){
   var k=$('kpis'),ev=S.ev.filter(function(e){return e.clase!=='mes';});
   if(!ev.length||unaOP()){k.style.display='none';k.innerHTML='';return;}
   k.style.display='';
-  var real={},prog={},aud=0,audCM=0,rech=0,conRes=0,cort=0,todas={};
+  var real={},prog={},aud=0,audCM=0,rech=0,conRes=0,cort=0,hayCorte=false,todas={};
   ev.forEach(function(e){todas[e.op]=1;
     if(e.clase==='real'){real[e.op]=1;
       if(e.etapa==='Auditoría'){aud++;if(e.fuente==='Auditorías de Calidad Manufactura'){audCM++;if(e.resultado){conRes++;if(/RECHAZ/i.test(e.resultado))rech++;}}}
-      if(e.etapa==='Corte'&&e.fuente==='Liquidación de corte')cort+=Number(e.cantidad)||0;}
+      if(e.etapa==='Corte'&&e.fuente==='Liquidación de corte'){hayCorte=true;cort+=Number(e.cantidad)||0;}}
     else if(e.clase==='programa')prog[e.op]=1;});
   var nReal=Object.keys(real).length,nTodas=Object.keys(todas).length,nProg=Object.keys(prog).length;
   var t=[];
   t.push(['OPs con movimiento real',nReal,'de '+fmt(nTodas)+' OPs con algún registro o programa en el mes','hero']);
   if(!S.off['Auditoría'])t.push(['Auditorías registradas',aud,audCM?(fmt(rech)+' rechazadas de '+fmt(conRes)+' auditorías de Calidad Manufactura con resultado ('+pct(rech,conRes)+')'):'auditorías de Calidad Manufactura, en taller e inspección de corte','neutro']);
-  if(!S.off['Corte'])t.push(['Prendas cortadas',cort,'según la liquidación de corte de Calidad Textil','']);
+  if(!S.off['Corte']&&hayCorte)t.push(['Prendas cortadas',cort,'según la liquidación de corte de Calidad Textil','']);
   t.push(['OPs con programa en el mes',nProg,'corte, costura, acabados o despacho programados','neutro']);
   /* barrita de composición: OPs con registro real por etapa (solo en la tarjeta principal) */
   var porEt={};ev.forEach(function(e){if(e.clase==='real'){(porEt[e.etapa]=porEt[e.etapa]||{})[e.op]=1;}});
