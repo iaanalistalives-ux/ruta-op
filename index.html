@@ -521,6 +521,75 @@ tr:hover td{background:var(--warm-light);}
 .cargando{opacity:.55;transition:opacity .2s;}
 #rtToast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--petrol);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 18px;box-shadow:0 6px 18px rgba(14,59,54,.3);opacity:0;transition:.25s;z-index:2147480000;pointer-events:none;}
 #rtToast.ver{opacity:1;transform:translateX(-50%) translateY(0);}
+/* ===== v2 · más vida ===== */
+.chip{background:var(--t);border-color:var(--c);color:#24332F;transition:.15s;}
+.chip:hover{box-shadow:0 2px 6px rgba(14,59,54,.12);transform:translateY(-1px);}
+.chip.off{background:#fff;border-color:var(--warm);opacity:.5;text-decoration:line-through;}
+.kpi{transition:box-shadow .15s,transform .15s;}
+.kpi:hover{box-shadow:var(--sh-h);transform:translateY(-1px);}
+.kpi.hero{background:linear-gradient(135deg,#0E3B36 0%,#12463F 60%,#0F5A4C 100%);}
+.kpi.hero .banda{background:var(--emer);}
+.kpi.hero .l{color:#8FB3AC;}.kpi.hero .v{color:#fff;}.kpi.hero .s{color:#B9CFC9;}
+.kpi .mini{display:flex;gap:3px;height:6px;margin-top:10px;border-radius:4px;overflow:hidden;background:var(--warm-light);}
+.kpi.hero .mini{background:rgba(255,255,255,.12);}
+.kpi .mini span{display:block;height:100%;}
+.pulso{display:flex;align-items:flex-end;gap:3px;height:74px;padding:6px 2px 0;margin-bottom:4px;border-bottom:1px solid var(--warm);}
+.pulso .pb{flex:1;display:flex;flex-direction:column-reverse;cursor:pointer;min-width:0;height:100%;justify-content:flex-start;position:relative;}
+.pulso .pb span{display:block;width:100%;}
+.pulso .pb span:last-child{border-radius:3px 3px 0 0;}
+.pulso .pb:hover{filter:brightness(1.12);}
+.pulso .pb.sel::after{content:'';position:absolute;left:0;right:0;bottom:-5px;height:3px;background:var(--petrol);border-radius:2px;}
+.pulso .pb.hoyb::before{content:'';position:absolute;left:50%;top:-2px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--sage);}
+.pulsoeje{display:flex;gap:3px;padding:0 2px;margin-bottom:12px;}
+.pulsoeje span{flex:1;text-align:center;font-size:9.5px;color:#9AAAA5;min-width:0;}
+.cal .d{transition:background .15s;}
+.cal .d.fin{background:#FAFCFB;}
+.cal .dn.fin{background:#EAF1EE;}
+.cal .d .n{font-size:13.5px;}
+.cal .d .tot{float:right;font-size:10px;font-weight:700;color:var(--sage-dark);background:#E7F4EF;border-radius:20px;padding:1px 7px;margin-top:2px;}
+.cal .pl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;line-height:1.25;margin-top:3px;padding:2px 7px;border-radius:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal .pl b{font-size:11.5px;}
+.cal .pl .tx{font-weight:600;}
+.cal .pl.prog{background:#fff!important;border:1.5px dashed;font-weight:600;}
+.cal .ev{border-radius:6px;box-shadow:0 1px 2px rgba(14,59,54,.15);}
+.cal .d.sel{box-shadow:inset 0 0 0 2px var(--sage),0 4px 14px rgba(15,122,90,.18);background:#EEF8F3!important;z-index:1;}
+.cal .d.hoy .n{box-shadow:0 0 0 3px rgba(16,185,129,.25);}
+@keyframes rtIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.cal .d .pl,.cal .d .ev{animation:rtIn .35s ease both;}
+.dhead{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#0E3B36,#12463F);color:#fff;border-radius:10px;padding:12px 16px;margin:-4px 0 10px;}
+.dhead .dnum{font-size:40px;font-weight:700;line-height:1;letter-spacing:-1px;}
+.dhead .ddia{font-size:14px;font-weight:700;text-transform:capitalize;}
+.dhead .dmes{font-size:12px;color:#B9CFC9;}
+.dhead .dtot{margin-left:auto;text-align:right;font-size:11px;color:#B9CFC9;line-height:1.2;}
+.dhead .dtot b{display:block;font-size:22px;color:#fff;}
+.dres{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.dres span{font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;}
+.it{background:#fff;border:1px solid var(--warm);border-left:4px solid var(--c,var(--warm));box-shadow:0 1px 2px rgba(14,59,54,.05);transition:.15s;}
+.it:hover{background:#fff;box-shadow:var(--sh-h);transform:translateX(2px);}
+.it.prog{border-left-style:dashed;background:#FCFDFD;}
+.dia h4{color:var(--c);}
+.mcard{position:relative;overflow:hidden;transition:.15s;}
+.mcard:hover{transform:translateY(-2px);}
+.mcard.act{border-color:var(--sage);box-shadow:0 0 0 2px rgba(15,122,90,.2);}
+.mcard .mt{display:flex;align-items:baseline;justify-content:space-between;}
+.mcard .mt small{font-size:11px;color:var(--stone);font-weight:700;}
+.mcard .br{display:grid;grid-template-columns:78px 1fr 30px;align-items:center;gap:6px;font-size:11.5px;margin-top:4px;}
+.mcard .br .tr{height:8px;border-radius:4px;background:var(--warm-light);overflow:hidden;}
+.mcard .br .tr i{display:block;height:100%;border-radius:4px;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1);}
+.mcard .br.prog .tr i{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.55) 0 3px,transparent 3px 6px)!important;}
+.mcard .br b{text-align:right;font-size:11.5px;}
+.mcard .br.prog{color:var(--stone);}
+.paso{position:relative;background:#fff;border:1px solid var(--warm);border-top:4px solid var(--c);transition:.15s;}
+.paso:hover{transform:translateY(-2px);}
+.paso .ic{position:absolute;right:10px;top:10px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;background:var(--c);}
+.paso.real{background:var(--t);}
+.paso.prog{border-style:dashed;border-top-style:solid;}
+.paso.prog .ic{background:#fff;color:var(--c);border:2px dashed var(--c);}
+.paso.nada{background:#FAFBFB;border-top-color:#C9D5D1;}
+.paso.nada .ic{background:#DCE5E2;color:#fff;}
+.paso:not(:last-child)::after{content:'›';position:absolute;right:-9px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#B8C4C0;z-index:1;}
+.sbar{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
+.sbar i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,#F7A9A9,#DC2626);}
 @media(max-width:1100px){.col8,.col4{grid-column:span 12;}.anio{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:900px){.wrap{padding:12px 12px 36px;}.kpis{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){
@@ -539,6 +608,13 @@ tr:hover td{background:var(--warm-light);}
   .cal .ln{font-size:0;gap:2px;margin-top:1px;}
   .cal .ln i{width:7px;height:7px;}
   .cal .ln b{font-size:10px;}
+  .cal .pl{font-size:0;padding:1px 5px;gap:2px;margin-top:2px;justify-content:center;}
+  .cal .pl b{font-size:10px;}
+  .cal .pl .tx{display:none;}
+  .cal .d .tot{display:none;}
+  .pulso{height:54px;gap:1px;}.pulsoeje{gap:1px;}.pulsoeje span{font-size:8px;}
+  .dhead .dnum{font-size:32px;}
+  .paso:not(:last-child)::after{display:none;}
   .cal .ln .tx{display:none;}
   .cal .ev{display:none;}
   .cal .evm{display:inline-block!important;}
@@ -652,6 +728,11 @@ function pct(a,b){return b?(a/b*100).toLocaleString('es-PE',{minimumFractionDigi
 function fCorta(s){var d=dISO(s);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();}
 function fLarga(s){var d=dISO(s);return d.getDate()+' de '+MESES[d.getMonth()].toLowerCase()+' de '+d.getFullYear();}
 function etapasOn(){return ETAPAS.filter(function(e){return !S.off[e.k];}).map(function(e){return e.k;});}
+function rgba(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';}
+function oscuro(h){var n=parseInt(h.slice(1),16),f=.62;return 'rgb('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','+Math.round((n&255)*f)+')';}
+var DSEM=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function contar(el){var fin=+el.dataset.n,t0=performance.now();if(!isFinite(fin))return;
+  (function paso(t){var k=Math.min((t-t0)/800,1),e=1-Math.pow(1-k,3);el.textContent=fmt(fin*e);if(k<1)requestAnimationFrame(paso);})(t0);}
 function toast(t){var x=$('rtToast');x.textContent=t;x.classList.add('ver');clearTimeout(toast._t);toast._t=setTimeout(function(){x.classList.remove('ver');},2200);}
 
 /* ---------- base ---------- */
@@ -721,11 +802,16 @@ function pintarKpis(){
     else if(e.clase==='programa')prog[e.op]=1;});
   var nReal=Object.keys(real).length,nTodas=Object.keys(todas).length,nProg=Object.keys(prog).length;
   var t=[];
-  t.push(['OPs con movimiento real',fmt(nReal),'de '+fmt(nTodas)+' OPs con algún registro o programa en el mes','']);
-  if(!S.off['Auditoría'])t.push(['Auditorías registradas',fmt(aud),audCM?(fmt(rech)+' rechazadas de '+fmt(conRes)+' auditorías de Calidad Manufactura con resultado ('+pct(rech,conRes)+')'):'auditorías de Calidad Manufactura, en taller e inspección de corte','neutro']);
-  if(!S.off['Corte'])t.push(['Prendas cortadas',fmt(cort),'según la liquidación de corte de Calidad Textil','']);
-  t.push(['OPs con programa en el mes',fmt(nProg),'corte, costura, acabados o despacho programados','neutro']);
-  k.innerHTML=t.map(function(x){return '<div class="kpi '+x[3]+'"><span class="banda"></span><div class="cuerpo"><div class="l">'+esc(x[0])+'</div><div class="v">'+x[1]+'</div><div class="s">'+esc(x[2])+'</div></div></div>';}).join('');
+  t.push(['OPs con movimiento real',nReal,'de '+fmt(nTodas)+' OPs con algún registro o programa en el mes','hero']);
+  if(!S.off['Auditoría'])t.push(['Auditorías registradas',aud,audCM?(fmt(rech)+' rechazadas de '+fmt(conRes)+' auditorías de Calidad Manufactura con resultado ('+pct(rech,conRes)+')'):'auditorías de Calidad Manufactura, en taller e inspección de corte','neutro']);
+  if(!S.off['Corte'])t.push(['Prendas cortadas',cort,'según la liquidación de corte de Calidad Textil','']);
+  t.push(['OPs con programa en el mes',nProg,'corte, costura, acabados o despacho programados','neutro']);
+  /* barrita de composición: OPs con registro real por etapa (solo en la tarjeta principal) */
+  var porEt={};ev.forEach(function(e){if(e.clase==='real'){(porEt[e.etapa]=porEt[e.etapa]||{})[e.op]=1;}});
+  var tot=0,seg=ETAPAS.map(function(E){var n=porEt[E.k]?Object.keys(porEt[E.k]).length:0;tot+=n;return [E,n];}).filter(function(x){return x[1];});
+  var mini=tot?'<div class="mini" title="OPs con registro real por etapa">'+seg.map(function(x){return '<span style="flex:'+x[1]+';background:'+x[0].c+'" title="'+esc(x[0].n+': '+x[1]+' OP')+'"></span>';}).join('')+'</div>':'';
+  k.innerHTML=t.map(function(x,i){return '<div class="kpi '+x[3]+'"><span class="banda"></span><div class="cuerpo"><div class="l">'+esc(x[0])+'</div><div class="v" data-n="'+x[1]+'">'+fmt(x[1])+'</div><div class="s">'+esc(x[2])+'</div>'+(i===0?mini:'')+'</div></div>';}).join('');
+  [].forEach.call(k.querySelectorAll('.v[data-n]'),contar);
 }
 
 function unaOP(){return S.ruta&&S.ruta.op&&S.q===S.ruta.op.op;}
@@ -734,18 +820,30 @@ function pintarMes(){
   $('pCal').className='panel col8';$('pDia').style.display='';
   $('calTit').textContent='Calendario de '+MESES[S.m].toLowerCase()+' '+S.y;
   var nOps={};S.ev.forEach(function(e){if(e.clase!=='mes')nOps[e.op]=1;});
-  $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'En cada día: cuántas OPs distintas tienen registro (punto lleno) o programa (punto hueco) en cada etapa.')+
+  $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'Arriba, la actividad registrada de cada día. En cada día: cuántas OPs distintas tienen registro (color lleno) o programa (borde punteado) en cada etapa.')+
     (filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' '+fmt(Object.keys(nOps).length)+' OPs en el mes. Toca un día para ver el detalle.';
   leyenda();
   var ini=new Date(S.y,S.m,1),off=(ini.getDay()+6)%7,dias=new Date(S.y,S.m+1,0).getDate();
-  var celdas=Math.ceil((off+dias)/7)*7,h=DIAS.map(function(d){return '<div class="dn">'+d+'</div>';}).join('');
+  var celdas=Math.ceil((off+dias)/7)*7,h=DIAS.map(function(d,i){return '<div class="dn'+(i>4?' fin':'')+'">'+d+'</div>';}).join('');
+  /* pulso del mes: OPs con registro real por día, apiladas por etapa */
+  var pul=[],mxP=0;
+  for(var q=1;q<=dias;q++){var kq=iso(new Date(S.y,S.m,q)),g2={};(S.porDia[kq]||[]).forEach(function(e){if(e.clase==='real')(g2[e.etapa]=g2[e.etapa]||{})[e.op]=1;});
+    var segs=ETAPAS.map(function(E){return [E,g2[E.k]?Object.keys(g2[E.k]).length:0];}).filter(function(x){return x[1];}),sm=segs.reduce(function(a,x){return a+x[1];},0);
+    if(sm>mxP)mxP=sm;pul.push([kq,segs,sm]);}
+  var pulso='';
+  if(mxP&&!unaOP()){
+    pulso='<div class="pulso" title="OPs con registro real por día">'+pul.map(function(x){return '<div class="pb'+(x[0]===S.sel?' sel':'')+(x[0]===HOY?' hoyb':'')+'" data-d="'+x[0]+'" title="'+esc(fLarga(x[0])+': '+x[2]+' (OPs con registro real, por etapa)')+'">'+
+      x[1].map(function(s2){return '<span style="height:'+(s2[1]/mxP*100).toFixed(1)+'%;background:'+s2[0].c+'"></span>';}).join('')+'</div>';}).join('')+'</div>'+
+      '<div class="pulsoeje">'+pul.map(function(x,i){var dd=i+1;return '<span>'+((dd===1||dd%5===0||dd===dias)?dd:'')+'</span>';}).join('')+'</div>';
+  }
   for(var i=0;i<celdas;i++){
     var d=new Date(S.y,S.m,1-off+i),k=iso(d),fuera=d.getMonth()!==S.m;
     if(fuera){h+='<div class="d fuera"><span class="n">'+d.getDate()+'</span></div>';continue;}
-    var ev=S.porDia[k]||[],cls='d'+(k===HOY?' hoy':'')+(k===S.sel?' sel':'');
-    h+='<div class="'+cls+'" data-d="'+k+'" role="button" tabindex="0" aria-label="'+esc(fLarga(k))+'"><span class="n">'+d.getDate()+'</span>'+celda(ev)+'</div>';
+    var ev=S.porDia[k]||[],cls='d'+(k===HOY?' hoy':'')+(k===S.sel?' sel':'')+(i%7>4?' fin':'');
+    var opsD={};ev.forEach(function(e){opsD[e.op]=1;});var nD=Object.keys(opsD).length;
+    h+='<div class="'+cls+'" data-d="'+k+'" role="button" tabindex="0" aria-label="'+esc(fLarga(k))+'"><span class="n">'+d.getDate()+'</span>'+(nD&&!unaOP()?'<span class="tot" title="OPs distintas este día">'+nD+' OP</span>':'')+celda(ev)+'</div>';
   }
-  $('calCuerpo').innerHTML='<div class="cal">'+h+'</div>';
+  $('calCuerpo').innerHTML=pulso+'<div class="cal">'+h+'</div>';
 }
 function celda(ev){
   if(!ev.length)return '';
@@ -761,8 +859,8 @@ function celda(ev){
   var g={};ev.forEach(function(e){var k=e.etapa+'|'+(e.clase==='programa'?'p':'r');(g[k]=g[k]||{e:e.etapa,p:e.clase==='programa',ops:{}}).ops[e.op]=1;});
   var l=Object.keys(g).map(function(k){var x=g[k];x.n=Object.keys(x.ops).length;return x;})
     .sort(function(a,b){return a.p-b.p||ORDEN[a.e]-ORDEN[b.e];}),h2='',mx=8;
-  l.slice(0,mx).forEach(function(x){var c=COL[x.e];
-    h2+='<div class="ln'+(x.p?' prog':'')+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><i style="'+(x.p?'border-color:'+c:'background:'+c)+'"></i><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?' prog.':'')+'</span></div>';});
+  l.slice(0,mx).forEach(function(x,j){var c=COL[x.e];
+    h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?' prog.':'')+'</span></div>';});
   if(l.length>mx)h2+='<div class="mas">+'+(l.length-mx)+' más</div>';
   return h2;
 }
@@ -782,17 +880,22 @@ function pintarDia(){
   var k=S.sel,ev=(S.porDia[k]||[]).slice();
   [].forEach.call(document.querySelectorAll('.cal .d.sel'),function(x){x.classList.remove('sel');});
   var c=document.querySelector('.cal .d[data-d="'+k+'"]');if(c)c.classList.add('sel');
-  $('diaTit').textContent=fLarga(k).replace(/^./,function(x){return x.toUpperCase();});
+  [].forEach.call(document.querySelectorAll('.pulso .pb'),function(x){x.classList.toggle('sel',x.dataset.d===k);});
   var ops={};ev.forEach(function(e){ops[e.op]=1;});
-  $('diaSub').textContent=ev.length?(fmt(ev.length)+' registro(s) y programa(s) de '+fmt(Object.keys(ops).length)+' OP(s). Toca una OP para ver su ruta.'):'';
+  var dd=dISO(k);
+  $('diaTit').innerHTML='<div class="dhead"><span class="dnum">'+dd.getDate()+'</span><div><div class="ddia">'+DSEM[dd.getDay()]+'</div><div class="dmes">'+MESES[dd.getMonth()].toLowerCase()+' '+dd.getFullYear()+'</div></div>'+
+    (ev.length?'<div class="dtot"><b>'+fmt(Object.keys(ops).length)+'</b>OPs</div>':'')+'</div>';
+  var ce={};ev.forEach(function(e){(ce[e.etapa]=ce[e.etapa]||{})[e.op]=1;});
+  $('diaSub').innerHTML=ev.length?('<div class="dres">'+ETAPAS.filter(function(E){return ce[E.k];}).map(function(E){return '<span style="background:'+rgba(E.c,.14)+';color:'+oscuro(E.c)+'">'+Object.keys(ce[E.k]).length+' '+esc(E.n)+'</span>';}).join('')+'</div>'+
+    esc(fmt(ev.length)+' registro(s) y programa(s). Toca una OP para ver su ruta.')):'';
   if(!ev.length){$('diaCuerpo').innerHTML='<div class="vac">No hay registros ni programas este día con los filtros elegidos.</div>';return;}
   ev.sort(function(a,b){return ORDEN[a.etapa]-ORDEN[b.etapa]||(a.clase==='programa')-(b.clase==='programa')||String(b.op).localeCompare(String(a.op));});
   var total=ev.length,vis=ev.slice(0,LIM),h='',et='';
   vis.forEach(function(e){
-    if(e.etapa!==et){et=e.etapa;h+='<h4><i style="background:'+COL[et]+'"></i>'+esc(NOM[et])+'</h4>';}
+    if(e.etapa!==et){et=e.etapa;h+='<h4 style="--c:'+oscuro(COL[et])+'"><i style="background:'+COL[et]+'"></i>'+esc(NOM[et])+'</h4>';}
     var pill=e.clase==='programa'?'<span class="pill prog">Programado'+(e.fin?' '+fCorta(e.fecha).slice(0,5)+'–'+fCorta(e.fin).slice(0,5):'')+'</span>':
       (e.resultado?'<span class="pill '+(/RECHAZ/i.test(e.resultado)?'bad':'ok')+'">'+esc(e.resultado)+'</span>':'');
-    h+='<div class="it" data-op="'+esc(e.op)+'"><div class="t1"><span class="op">OP '+esc(e.op)+'</span><span class="g">'+esc([e.grupo,e.estilo].filter(Boolean).join(' · '))+'</span>'+pill+'</div>'+
+    h+='<div class="it'+(e.clase==='programa'?' prog':'')+'" style="--c:'+COL[e.etapa]+'" data-op="'+esc(e.op)+'"><div class="t1"><span class="op">OP '+esc(e.op)+'</span><span class="g">'+esc([e.grupo,e.estilo].filter(Boolean).join(' · '))+'</span>'+pill+'</div>'+
       '<div class="t2">'+esc(e.titulo)+'</div><div class="t3">'+esc(e.detalle||'')+'</div></div>';
   });
   if(total>LIM)h+='<div class="lim">Se muestran '+LIM+' de '+fmt(total)+' registros de este día. Usa los filtros para ver los demás.</div>';
@@ -806,9 +909,9 @@ function pintarSeg(){
   var tot=s.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0);
   $('segTit').textContent='Segundas registradas en '+MESES[S.m].toLowerCase()+' '+S.y+' · '+fmt(tot)+' en total';
   s.sort(function(a,b){return (Number(b.cantidad)||0)-(Number(a.cantidad)||0)||String(b.op).localeCompare(String(a.op));});
-  var vis=s.slice(0,LIM);
+  var vis=s.slice(0,LIM),mxS=Math.max.apply(null,vis.map(function(e){return Number(e.cantidad)||0;}).concat([1]));
   var h='<table><thead><tr><th>OP</th><th>Grupo</th><th>Estilo</th><th>Tipo y área que la generó</th><th>Motivo</th><th style="text-align:right">Cantidad</th></tr></thead><tbody>'+
-    vis.map(function(e){return '<tr class="it2" data-op="'+esc(e.op)+'" style="cursor:pointer"><td><b>'+esc(e.op)+'</b></td><td>'+esc(e.grupo||'')+'</td><td>'+esc(e.estilo||'')+'</td><td>'+esc(e.titulo.replace(/^Segundas /,''))+'</td><td>'+esc(e.detalle||'')+'</td><td class="n">'+fmt(e.cantidad)+'</td></tr>';}).join('')+
+    vis.map(function(e){return '<tr class="it2" data-op="'+esc(e.op)+'" style="cursor:pointer"><td><b>'+esc(e.op)+'</b></td><td>'+esc(e.grupo||'')+'</td><td>'+esc(e.estilo||'')+'</td><td>'+esc(e.titulo.replace(/^Segundas /,''))+'</td><td>'+esc(e.detalle||'')+'</td><td class="n"><div class="sbar"><i style="width:'+Math.max(4,(Number(e.cantidad)||0)/mxS*90).toFixed(0)+'px"></i>'+fmt(e.cantidad)+'</div></td></tr>';}).join('')+
     '</tbody></table>';
   if(s.length>LIM)h+='<div class="lim">Se muestran '+LIM+' de '+fmt(s.length)+' filas. Usa los filtros para ver las demás.</div>';
   $('segCuerpo').innerHTML=h;
@@ -817,17 +920,19 @@ function pintarSeg(){
 function pintarAnio(){
   $('pCal').className='panel col12';
   $('calTit').textContent='Año '+S.y+' por mes';
-  $('calSub').textContent='En cada mes: cuántas OPs distintas tienen registro o programa en cada etapa (cuentan en el mes en que empiezan). Las segundas se registran por mes.'+(filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' Toca un mes para abrir su calendario.';
+  $('calSub').textContent='En cada mes: cuántas OPs distintas tienen registro o programa en cada etapa (cuentan en el mes en que empiezan). La barra compara contra el mes con más OPs de esa etapa en el año. Las segundas se registran por mes.'+(filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' Toca un mes para abrir su calendario.';
   leyenda();
   var pm={};S.meses.forEach(function(x){(pm[x.mes]=pm[x.mes]||[]).push(x);});
-  var h='';
+  var h='',mx={};S.meses.forEach(function(x){var kk=x.etapa+x.clase;if(!mx[kk]||x.ops>mx[kk])mx[kk]=x.ops;});
+  var mAct=(S.y===hoy.getFullYear())?hoy.getMonth():-1;
   for(var m=1;m<=12;m++){
     var l=(pm[m]||[]).sort(function(a,b){return (a.clase==='programa')-(b.clase==='programa')||ORDEN[a.etapa]-ORDEN[b.etapa];});
-    h+='<div class="mcard'+(l.length?'':' vacio')+'" data-m="'+(m-1)+'"'+(l.length?' role="button" tabindex="0"':'')+'><div class="mt">'+MESES[m-1]+'</div>'+
-      (l.length?l.map(function(x){var c=COL[x.etapa],p=x.clase==='programa';
-        return '<div class="ln"'+(p?' style="color:var(--stone)"':'')+'><i style="'+(p?'background:#fff;border:2px solid '+c:'background:'+c)+'"></i>'+esc(NOM[x.etapa])+(p?' prog.':'')+'<span>'+fmt(x.ops)+'</span></div>';}).join(''):'<div class="vac">Sin registros</div>')+'</div>';
+    h+='<div class="mcard'+(l.length?'':' vacio')+(m-1===mAct?' act':'')+'" data-m="'+(m-1)+'"'+(l.length?' role="button" tabindex="0"':'')+'><div class="mt">'+MESES[m-1]+(m-1===mAct?'<small>mes actual</small>':'')+'</div>'+
+      (l.length?l.map(function(x){var c=COL[x.etapa],p=x.clase==='programa',w=(x.ops/(mx[x.etapa+x.clase]||1)*100).toFixed(0);
+        return '<div class="br'+(p?' prog':'')+'" title="'+esc(NOM[x.etapa]+(p?' programado':'')+': '+x.ops+' OPs (100% = el mes con más OPs de esta etapa en el año)')+'"><span>'+esc(NOM[x.etapa])+(p?' prog.':'')+'</span><div class="tr"><i data-w="'+w+'" style="background:'+c+'"></i></div><b>'+fmt(x.ops)+'</b></div>';}).join(''):'<div class="vac">Sin registros</div>')+'</div>';
   }
   $('calCuerpo').innerHTML='<div class="anio">'+h+'</div>';
+  setTimeout(function(){[].forEach.call(document.querySelectorAll('.mcard .tr i[data-w]'),function(i){i.style.width=i.dataset.w+'%';});},60);
 }
 
 /* ---------- ruta de una OP ---------- */
@@ -856,8 +961,8 @@ function pintarRuta(){
       if(!re.length){linea1=tx;ir=fp[0];}else linea2=(linea2?linea2+' · ':'')+tx;}
     if(ms.length){var tot=ms.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0),mm={};ms.forEach(function(e){mm[e.fecha.slice(0,7)]=1;});
       linea1=fmt(tot)+' segundas';linea2='Registradas en '+Object.keys(mm).sort().map(function(k){return MESES[+k.slice(5,7)-1].toLowerCase()+' '+k.slice(0,4);}).join(', ');ir=ms[0].fecha;}
-    var nada=!l.length;
-    h+='<div class="paso'+(nada?' nada':'')+'" style="border-top-color:'+E.c+'"'+(ir?' data-ir="'+ir+'"':'')+'><div class="pn" style="color:'+E.c+'">'+esc(E.n)+'</div>'+
+    var nada=!l.length,est=nada?'nada':((re.length||ms.length)?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    h+='<div class="paso '+est+'" style="--c:'+E.c+';--t:'+rgba(E.c,.09)+'"'+(ir?' data-ir="'+ir+'"':'')+'><span class="ic">'+ic+'</span><div class="pn" style="color:'+(nada?'#9AAAA5':oscuro(E.c))+'">'+esc(E.n)+'</div>'+
       '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div></div>';
   });
   $('rFlujo').innerHTML=h;
@@ -883,14 +988,14 @@ function buscarSug(){
   var v=$('fQ').value.trim();clearTimeout(sugT);
   if(v.length<3){cerrarSug();return;}
   sugT=setTimeout(function(){rpc('buscar',{q:v}).then(function(l){
-    if($('fQ').value.trim()!==v)return;
+    if($('fQ').value.trim()!==v||S.q===v.toUpperCase())return;
     if(!l||!l.length){cerrarSug();return;}
     $('sug').innerHTML=l.slice(0,40).map(function(x){return '<div data-op="'+esc(x.op)+'"><b>OP '+esc(x.op)+'</b> · '+esc(x.grupo||'')+' · '+esc(x.estilo||'')+'<br><small>'+esc([x.e_cliente,x.colores].filter(Boolean).join(' · '))+'</small></div>';}).join('');
     $('sug').classList.add('on');sugI=-1;
   }).catch(function(){});},280);
 }
 function iniciar(){
-  $('chips').innerHTML=ETAPAS.map(function(e){return '<button type="button" class="chip" data-k="'+esc(e.k)+'"><i style="background:'+e.c+'"></i>'+esc(e.n)+'</button>';}).join('');
+  $('chips').innerHTML=ETAPAS.map(function(e){return '<button type="button" class="chip" data-k="'+esc(e.k)+'" style="--c:'+e.c+';--t:'+rgba(e.c,.13)+'"><i style="background:'+e.c+'"></i>'+esc(e.n)+'</button>';}).join('');
   $('chips').addEventListener('click',function(ev){var b=ev.target.closest('.chip');if(!b)return;var k=b.dataset.k;
     if(S.off[k])delete S.off[k];else S.off[k]=1;b.classList.toggle('off',!!S.off[k]);cargar();});
   $('segVista').addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b||b.dataset.v===S.vista)return;S.vista=b.dataset.v;marcarVista();cargar();});
@@ -909,7 +1014,7 @@ function iniciar(){
   $('sug').addEventListener('mousedown',function(e){var d=e.target.closest('div[data-op]');if(d){e.preventDefault();aplicarQ(d.dataset.op,true);}});
   document.addEventListener('click',function(e){if(!e.target.closest('.qwrap'))cerrarSug();});
   $('calCuerpo').addEventListener('click',function(e){
-    var d=e.target.closest('.d[data-d]');if(d){S.sel=d.dataset.d;pintarDia();if(window.matchMedia('(max-width:1100px)').matches)$('pDia').scrollIntoView({behavior:'smooth',block:'start'});return;}
+    var d=e.target.closest('.d[data-d],.pb[data-d]');if(d){S.sel=d.dataset.d;pintarDia();if(window.matchMedia('(max-width:1100px)').matches)$('pDia').scrollIntoView({behavior:'smooth',block:'start'});return;}
     var m=e.target.closest('.mcard[data-m]');if(m&&!m.classList.contains('vacio')){S.vista='mes';S.m=+m.dataset.m;S.sel=null;marcarVista();cargar();}});
   $('calCuerpo').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var t=e.target.closest('[data-d],[data-m]');if(t){e.preventDefault();t.click();}}});
   $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
