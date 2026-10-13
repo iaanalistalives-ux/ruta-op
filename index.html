@@ -826,6 +826,21 @@ tr:hover td{background:var(--warm-light);}
   .wrap{padding:0;}
   .panel,.kpi{box-shadow:none;border:1px solid var(--warm);break-inside:avoid;}
 }
+/* v2.4: en PC todo cabe en la pantalla, sin barra de desplazamiento grande: el calendario y el detalle del día se desplazan por dentro */
+@media(min-width:1101px) and (min-height:560px){
+  html,body{height:100%;}
+  .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:14px;box-sizing:border-box;}
+  .wrap>.bar,.wrap>.err,.wrap>#pRuta{flex:none;}
+  #gCal{flex:1 1 0;min-height:380px;grid-template-rows:minmax(0,1fr);}
+  #pCal{display:flex;flex-direction:column;min-height:0;}
+  #calScroll{flex:1 1 0;min-height:0;overflow:auto;padding-right:4px;}
+  #pDia{position:relative;top:auto;align-self:stretch;max-height:none;min-height:0;}
+  #calScroll .cal{overflow:visible;}
+  #calScroll .cal .dn{position:sticky;top:0;z-index:3;}
+  #calScroll #pSeg{box-shadow:none;border-radius:0;padding:16px 0 4px;margin-top:16px!important;border-top:1px solid var(--warm);overflow:visible;}
+  #calScroll #pSeg .tira{display:none;}
+  #calScroll #pSeg .tscroll{max-height:none;overflow:visible;}
+}
 </style>
 <style id="lsSinActCss">/* 12/10/2026: sin botón Actualizar propio; se usa el actualizar del portal */#bAct{display:none!important}</style>
 </head>
@@ -866,7 +881,7 @@ tr:hover td{background:var(--warm-light);}
       <div class="pt" id="calTit">Calendario</div>
       <div class="ph" id="calSub"></div>
       <div class="ley" id="ley" style="display:none"></div>
-      <div id="calCuerpo"></div>
+      <div id="calScroll"><div id="calCuerpo"></div></div>
     </div>
     <div class="panel col4" id="pDia">
       <span class="tira"></span>
@@ -973,6 +988,7 @@ function pintar(){
   $('kpis').innerHTML='';$('kpis').style.display='none';
   if(S.vista==='mes'){pintarMes();pintarDia();pintarSeg();}
   else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';$('pSeg').style.display='none';}
+  var cs=$('calScroll'),kk=S.vista+'|'+S.y+'|'+S.m+'|'+S.q;if(cs&&cs.dataset.k!==kk){cs.scrollTop=0;cs.dataset.k=kk;}
   guardarHash();
 }
 function leyenda(){
@@ -1240,6 +1256,14 @@ window.RUTA={
   ruta:function(){return unaOP()?S.ruta:null;},
   etapas:ETAPAS
 };
+/* v2.4: en PC las segundas van dentro del calendario (se desplazan con él); en celular y tablet, debajo como antes */
+(function(){
+  var mq=window.matchMedia('(min-width:1101px) and (min-height:560px)');
+  function ubicar(){var sg=document.getElementById('pSeg'),cs=document.getElementById('calScroll'),ap=document.getElementById('app');if(!sg||!cs||!ap)return;
+    if(mq.matches){if(sg.parentNode!==cs)cs.appendChild(sg);}else if(sg.parentNode!==ap)ap.appendChild(sg);}
+  if(mq.addEventListener)mq.addEventListener('change',ubicar);else if(mq.addListener)mq.addListener(ubicar);
+  ubicar();
+})();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar);else iniciar();
 })();
 </script>
