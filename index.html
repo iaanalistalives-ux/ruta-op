@@ -858,7 +858,7 @@ tr:hover td{background:var(--warm-light);}
     <div class="flujo" id="rFlujo"></div>
   </div>
 
-  <div class="kpis" id="kpis"></div>
+  <div class="kpis" id="kpis" style="display:none"></div>
 
   <div class="grid" id="gCal">
     <div class="panel col8" id="pCal">
@@ -970,7 +970,8 @@ function armarDias(){
 function pintar(){
   $('perTxt').textContent=S.vista==='mes'?(MESES[S.m]+' '+S.y):String(S.y);
   pintarRuta();
-  if(S.vista==='mes'){pintarKpis();pintarMes();pintarDia();pintarSeg();}
+  $('kpis').innerHTML='';$('kpis').style.display='none';
+  if(S.vista==='mes'){pintarMes();pintarDia();pintarSeg();}
   else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';$('pSeg').style.display='none';}
   guardarHash();
 }
