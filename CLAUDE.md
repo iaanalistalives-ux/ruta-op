@@ -3,16 +3,16 @@
 Las reglas generales de trabajo están en el repo privado `lives-instrucciones` (CLAUDE.md). Este archivo solo describe esta herramienta.
 
 ## Qué hace
-`index.html` es un **calendario de OPs** de solo lectura: junta lo **registrado** (real) y lo **programado** de todas las herramientas LIVES, por etapa: Pedido (OP creada), Corte, Costura, Acabados, Auditoría, Encajado, Despacho y Segundas (estas se registran por mes, sin día).
+`index.html` es un **calendario de OPs** de solo lectura: junta lo **registrado** (real) y lo **programado** de todas las herramientas LIVES, por etapa: Pedido (OP creada), Corte, Costura, Acabados, Encajado y Despacho. Desde el 12/11/2026 ya no muestra Auditorías ni Segundas (pedido de Christian): la pantalla las descarta, aunque siguen en `ruta_op_ev`.
 - Barra superior: búsqueda (OP, grupo, estilo o PO) con sugerencias desde 3 caracteres, cliente, Mes/Año, ‹ ›, Hoy y chips para prender o apagar etapas. El enlace se puede compartir (`#q=…&cliente=…&m=YYYY-MM`).
-- Vista Mes: grilla lunes a domingo con las OP distintas por etapa (relleno = real, borde punteado = programado). Panel "Día" con los registros (hasta 500) y panel "Segundas del mes".
+- Vista Mes: grilla lunes a domingo con las OP distintas por etapa (relleno = real, borde punteado = programado). Panel "Día" con los registros (hasta 500).
 - Vista Año: 12 tarjetas con barras por etapa, comparadas contra el mes con más OP de esa etapa.
-- **Ruta de una OP** (búsqueda de 4 a 6 dígitos): ficha (cliente, grupo, estilo, colores, PO, pedido, destino, tela) y una tarjeta por etapa con ✓ real, ◷ programado o – sin registro, con detalle propio (auditorías y rechazadas, prendas cortadas, último reporte de encajado, segundas por mes).
-- Excel LIVES: resúmenes del período, por etapa, auditorías de Calidad Manufactura con % de rechazadas, la ruta completa de la OP buscada y detalle de eventos.
+- **Ruta de una OP** (búsqueda de 4 a 6 dígitos): ficha (cliente, grupo, estilo, colores, PO, pedido, destino, tela) y una tarjeta por etapa con ✓ real, ◷ programado o – sin registro, con detalle propio (prendas cortadas, último reporte de encajado).
+- Excel LIVES: resúmenes del período, por etapa, la ruta completa de la OP buscada y detalle de eventos.
 
 ## Base de datos (Supabase lives-datos)
 - Una sola puerta: `ruta_op(p_accion, p)` con las acciones `eventos` (por rango de fechas), `meses` (por año), `ruta` (una OP), `buscar` y `clientes`.
-- Lee `ruta_op_ev` y `ruta_op_info`, y `cat_clientes` para el selector de cliente. Los eventos vienen de lo que registran las otras herramientas (auditorías de Calidad Manufactura, liquidación de corte, fotos de auditorías de taller, inspección de corte, encajado, segundas).
+- Lee `ruta_op_ev` y `ruta_op_info`, y `cat_clientes` para el selector de cliente. Los eventos que se muestran vienen de la base de OPs, la liquidación de corte, los programas de costura y acabados y el avance de encajado. La tabla también trae auditorías (Calidad Manufactura, fotos de taller, inspección de corte) y segundas, que la pantalla no muestra.
 - No usa Storage. No guarda nada.
 
 ## Quién la usa

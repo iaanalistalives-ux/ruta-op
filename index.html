@@ -798,8 +798,6 @@ tr:hover td{background:var(--warm-light);}
 .paso.nada{background:#FAFBFB;border-top-color:#C9D5D1;}
 .paso.nada .ic{background:#DCE5E2;color:#fff;}
 .paso:not(:last-child)::after{content:'›';position:absolute;right:-9px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#B8C4C0;z-index:1;}
-.sbar{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
-.sbar i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,#F7A9A9,#DC2626);}
 @media(max-width:1100px){.col8,.col4{grid-column:span 12;}.anio{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:900px){.wrap{padding:12px 12px 36px;}.kpis{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){
@@ -857,9 +855,6 @@ tr:hover td{background:var(--warm-light);}
   #pDia{position:relative;top:auto;align-self:stretch;max-height:none;min-height:0;}
   #calScroll .cal{overflow:visible;}
   #calScroll .cal .dn{position:sticky;top:0;z-index:3;}
-  #calScroll #pSeg{box-shadow:none;border-radius:0;padding:16px 0 4px;margin-top:16px!important;border-top:1px solid var(--warm);overflow:visible;}
-  #calScroll #pSeg .tira{display:none;}
-  #calScroll #pSeg .tscroll{max-height:none;overflow:visible;}
 }
 </style>
 <style id="lsSinActCss">/* 12/10/2026: sin botón Actualizar propio; se usa el actualizar del portal */#bAct{display:none!important}</style>
@@ -912,12 +907,6 @@ tr:hover td{background:var(--warm-light);}
     </div>
   </div>
 
-  <div class="panel col12" id="pSeg" style="display:none;margin-top:14px">
-    <span class="tira riesgo"></span>
-    <div class="pt" id="segTit">Segundas del mes</div>
-    <div class="ph">Prendas y piezas de segunda registradas por Calidad Textil para estas OPs. Se registran por mes, sin día, por eso no salen en el calendario.</div>
-    <div class="tscroll" id="segCuerpo"></div>
-  </div>
 </div>
 <div id="rtToast" role="status"></div>
 
@@ -933,10 +922,8 @@ var ETAPAS=[
   {k:'Corte',c:'#B45309',n:'Corte'},
   {k:'Costura',c:'#10B981',n:'Costura'},
   {k:'Acabados',c:'#F59E0B',n:'Acabados'},
-  {k:'Auditoría',c:'#0E3B36',n:'Auditorías'},
   {k:'Encajado',c:'#4E6B78',n:'Encajado'},
-  {k:'Despacho',c:'#0B815E',n:'Despacho'},
-  {k:'Segundas',c:'#DC2626',n:'Segundas'}
+  {k:'Despacho',c:'#0B815E',n:'Despacho'}
 ];
 var COL={},NOM={};ETAPAS.forEach(function(e){COL[e.k]=e.c;NOM[e.k]=e.n;});
 var ORDEN={};ETAPAS.forEach(function(e,i){ORDEN[e.k]=i;});
@@ -972,7 +959,8 @@ function rpc(accion,p){
   };
   return intento().catch(function(){return new Promise(function(ok){setTimeout(ok,1200);}).then(intento);});
 }
-function filtros(){var p={q:S.q,cliente:S.cli};var on=etapasOn();if(on.length<ETAPAS.length)p.etapas=on;return p;}
+function filtros(){var p={q:S.q,cliente:S.cli};var on=etapasOn();if(on.length)p.etapas=on;return p;}
+function soloEt(l){return (l||[]).filter(function(e){return COL[e.etapa]&&e.clase!=='mes';});}
 function rango(){var d=new Date(S.y,S.m,1),h=new Date(S.y,S.m+1,0);return {desde:iso(d),hasta:iso(h)};}
 function error(e){var b=$('err');$('errTx').textContent='No se pudo leer la base de datos: '+(e&&e.message||e)+'. Revisa tu conexión.';b.style.display='block';
   var av=$('avisoVivo');av.className='avisoVivo error';}
@@ -980,10 +968,10 @@ function error(e){var b=$('err');$('errTx').textContent='No se pudo leer la base
 function cargar(aviso){
   var n=++S.seq;$('err').style.display='none';$('app').classList.add('cargando');
   var p=filtros(),pr;
-  if(S.vista==='mes'){var r=rango();p.desde=r.desde;p.hasta=r.hasta;pr=rpc('eventos',p).then(function(ev){if(n!==S.seq)return;S.ev=ev||[];armarDias();});}
-  else{p.anio=S.y;pr=rpc('meses',p).then(function(m){if(n!==S.seq)return;S.meses=m||[];});}
+  if(S.vista==='mes'){var r=rango();p.desde=r.desde;p.hasta=r.hasta;pr=rpc('eventos',p).then(function(ev){if(n!==S.seq)return;S.ev=soloEt(ev);armarDias();});}
+  else{p.anio=S.y;pr=rpc('meses',p).then(function(m){if(n!==S.seq)return;S.meses=soloEt(m);});}
   var esOP=/^\d{4,6}$/.test(S.q);
-  var prR=esOP?rpc('ruta',{q:S.q}).then(function(r){if(n!==S.seq)return;S.ruta=(r&&r.op)?r:null;if(S.ruta)(S.ruta.eventos||[]).forEach(function(e){if(e.fin===undefined)e.fin=e.fecha_fin;});}):Promise.resolve().then(function(){S.ruta=null;});
+  var prR=esOP?rpc('ruta',{q:S.q}).then(function(r){if(n!==S.seq)return;S.ruta=(r&&r.op)?r:null;if(S.ruta)S.ruta.eventos=soloEt(S.ruta.eventos);if(S.ruta)(S.ruta.eventos||[]).forEach(function(e){if(e.fin===undefined)e.fin=e.fecha_fin;});}):Promise.resolve().then(function(){S.ruta=null;});
   return Promise.all([pr,prR]).then(function(){
     if(n!==S.seq)return;$('app').classList.remove('cargando');
     var av=$('avisoVivo');if(!/\bok\b/.test(av.className)){av.className='avisoVivo ok';}else if(aviso)toast('Actualizado');
@@ -1007,13 +995,13 @@ function pintar(){
   $('perTxt').textContent=S.vista==='mes'?(MESES[S.m]+' '+S.y):String(S.y);
   pintarRuta();
   $('kpis').innerHTML='';$('kpis').style.display='none';
-  if(S.vista==='mes'){pintarMes();pintarDia();pintarSeg();}
-  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';$('pSeg').style.display='none';}
+  if(S.vista==='mes'){pintarMes();pintarDia();}
+  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';}
   var cs=$('calScroll'),kk=S.vista+'|'+S.y+'|'+S.m+'|'+S.q;if(cs&&cs.dataset.k!==kk){cs.scrollTop=0;cs.dataset.k=kk;}
   guardarHash();
 }
 function leyenda(){
-  $('ley').innerHTML=ETAPAS.filter(function(e){return !S.off[e.k]&&e.k!=='Segundas';}).map(function(e){return '<span><i style="background:'+e.c+'"></i>'+esc(e.n)+'</span>';}).join('')+
+  $('ley').innerHTML=ETAPAS.filter(function(e){return !S.off[e.k];}).map(function(e){return '<span><i style="background:'+e.c+'"></i>'+esc(e.n)+'</span>';}).join('')+
     '<span style="color:var(--stone)"><i class="prog" style="color:var(--stone)"></i>programado</span>';
 }
 function filtroTxt(){var t=[];if(S.q)t.push('"'+S.q+'"');if(S.cli){var o=$('fCli').selectedOptions[0];t.push(o?o.textContent:S.cli);}
@@ -1023,16 +1011,14 @@ function pintarKpis(){
   var k=$('kpis'),ev=S.ev.filter(function(e){return e.clase!=='mes';});
   if(!ev.length||unaOP()){k.style.display='none';k.innerHTML='';return;}
   k.style.display='';
-  var real={},prog={},aud=0,audCM=0,rech=0,conRes=0,cort=0,hayCorte=false,todas={};
+  var real={},prog={},cort=0,hayCorte=false,todas={};
   ev.forEach(function(e){todas[e.op]=1;
     if(e.clase==='real'){real[e.op]=1;
-      if(e.etapa==='Auditoría'){aud++;if(e.fuente==='Auditorías de Calidad Manufactura'){audCM++;if(e.resultado){conRes++;if(/RECHAZ/i.test(e.resultado))rech++;}}}
       if(e.etapa==='Corte'&&e.fuente==='Liquidación de corte'){hayCorte=true;cort+=Number(e.cantidad)||0;}}
     else if(e.clase==='programa')prog[e.op]=1;});
   var nReal=Object.keys(real).length,nTodas=Object.keys(todas).length,nProg=Object.keys(prog).length;
   var t=[];
   t.push(['OPs con movimiento real',nReal,'de '+fmt(nTodas)+' OPs con algún registro o programa en el mes','hero']);
-  if(!S.off['Auditoría'])t.push(['Auditorías registradas',aud,audCM?(fmt(rech)+' rechazadas de '+fmt(conRes)+' auditorías de Calidad Manufactura con resultado ('+pct(rech,conRes)+')'):'auditorías de Calidad Manufactura, en taller e inspección de corte','neutro']);
   if(!S.off['Corte']&&hayCorte)t.push(['Prendas cortadas',cort,'según la liquidación de corte de Calidad Textil','']);
   t.push(['OPs con programa en el mes',nProg,'corte, costura, acabados o despacho programados','neutro']);
   /* barrita de composición: OPs con registro real por etapa (solo en la tarjeta principal) */
@@ -1080,7 +1066,7 @@ function celda(ev){
     var o=ev.slice().sort(function(a,b){return (a.clase==='programa')-(b.clase==='programa')||ORDEN[a.etapa]-ORDEN[b.etapa];}),h='',max=4;
     o.slice(0,max).forEach(function(e){var c=COL[e.etapa];
       h+=e.clase==='programa'?'<div class="ev prog" style="border-color:'+c+'" title="'+esc(e.titulo)+'">'+esc(e.titulo)+'</div>':
-        '<div class="ev" style="background:'+c+'" title="'+esc(e.titulo)+'">'+esc(corto(e))+'</div>';
+        '<div class="ev" style="background:'+c+'" title="'+esc(e.titulo)+'">'+esc(e.titulo)+'</div>';
       h+='<span class="evm" style="background:'+(e.clase==='programa'?'#fff;border:1.5px solid '+c:c)+'"></span>';});
     if(o.length>max)h+='<div class="mas">+'+(o.length-max)+' más</div>';
     return h;
@@ -1092,10 +1078,6 @@ function celda(ev){
     h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?' prog.':'')+'</span></div>';});
   if(l.length>mx)h2+='<div class="mas">+'+(l.length-mx)+' más</div>';
   return h2;
-}
-function corto(e){
-  if(e.fuente==='Auditorías de Calidad Manufactura')return e.titulo.replace('Auditoría ','Aud. ')+(e.resultado?' · '+e.resultado.charAt(0)+e.resultado.slice(1).toLowerCase():'');
-  return e.titulo;
 }
 
 function selInicial(){
@@ -1131,25 +1113,10 @@ function pintarDia(){
   $('diaCuerpo').innerHTML=h;
 }
 
-function pintarSeg(){
-  var s=S.ev.filter(function(e){return e.clase==='mes';});
-  if(!s.length||S.off['Segundas']){$('pSeg').style.display='none';return;}
-  $('pSeg').style.display='';
-  var tot=s.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0);
-  $('segTit').textContent='Segundas registradas en '+MESES[S.m].toLowerCase()+' '+S.y+' · '+fmt(tot)+' en total';
-  s.sort(function(a,b){return (Number(b.cantidad)||0)-(Number(a.cantidad)||0)||String(b.op).localeCompare(String(a.op));});
-  var vis=s.slice(0,LIM),mxS=Math.max.apply(null,vis.map(function(e){return Number(e.cantidad)||0;}).concat([1]));
-  var h='<table><thead><tr><th>OP</th><th>Grupo</th><th>Estilo</th><th>Tipo y área que la generó</th><th>Motivo</th><th style="text-align:right">Cantidad</th></tr></thead><tbody>'+
-    vis.map(function(e){return '<tr class="it2" data-op="'+esc(e.op)+'" style="cursor:pointer"><td><b>'+esc(e.op)+'</b></td><td>'+esc(e.grupo||'')+'</td><td>'+esc(e.estilo||'')+'</td><td>'+esc(e.titulo.replace(/^Segundas /,''))+'</td><td>'+esc(e.detalle||'')+'</td><td class="n"><div class="sbar"><i style="width:'+Math.max(4,(Number(e.cantidad)||0)/mxS*90).toFixed(0)+'px"></i>'+fmt(e.cantidad)+'</div></td></tr>';}).join('')+
-    '</tbody></table>';
-  if(s.length>LIM)h+='<div class="lim">Se muestran '+LIM+' de '+fmt(s.length)+' filas. Usa los filtros para ver las demás.</div>';
-  $('segCuerpo').innerHTML=h;
-}
-
 function pintarAnio(){
   $('pCal').className='panel col12';
   $('calTit').textContent='Año '+S.y+' por mes';
-  $('calSub').textContent='En cada mes: cuántas OPs distintas tienen registro o programa en cada etapa (cuentan en el mes en que empiezan). La barra compara contra el mes con más OPs de esa etapa en el año. Las segundas se registran por mes.'+(filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' Toca un mes para abrir su calendario.';
+  $('calSub').textContent='En cada mes: cuántas OPs distintas tienen registro o programa en cada etapa (cuentan en el mes en que empiezan). La barra compara contra el mes con más OPs de esa etapa en el año.'+(filtroTxt()?' Filtro: '+filtroTxt()+'.':'')+' Toca un mes para abrir su calendario.';
   leyenda();
   var pm={};S.meses.forEach(function(x){(pm[x.mes]=pm[x.mes]||[]).push(x);});
   var h='',mx={};S.meses.forEach(function(x){var kk=x.etapa+x.clase;if(!mx[kk]||x.ops>mx[kk])mx[kk]=x.ops;});
@@ -1175,22 +1142,18 @@ function pintarRuta(){
   $('rInfo').innerHTML=inf.filter(function(x){return x[1];}).map(function(x){return '<span><b>'+x[0]+'</b>'+esc(x[1])+'</span>';}).join('');
   var h='';
   ETAPAS.forEach(function(E){
-    var l=ev.filter(function(e){return e.etapa===E.k;}),re=l.filter(function(e){return e.clase==='real';}),pr=l.filter(function(e){return e.clase==='programa';}),ms=l.filter(function(e){return e.clase==='mes';});
+    var l=ev.filter(function(e){return e.etapa===E.k;}),re=l.filter(function(e){return e.clase==='real';}),pr=l.filter(function(e){return e.clase==='programa';});
     var linea1='',linea2='',ir='';
     if(re.length){var f=re.map(function(e){return e.fecha;}).sort();ir=f[f.length-1];
       linea1=(f[0]===f[f.length-1]?fCorta(f[0]):fCorta(f[0])+' al '+fCorta(f[f.length-1]));
-      if(E.k==='Auditoría'){var cm=re.filter(function(e){return e.fuente==='Auditorías de Calidad Manufactura';}),rc=cm.filter(function(e){return /RECHAZ/i.test(e.resultado||'');}).length,tl=re.filter(function(e){return e.fuente==='Fotos de auditorías de taller';}).length,ic=re.filter(function(e){return e.fuente==='Inspección de corte';}).length;
-        linea2=[cm.length?cm.length+' de Calidad Manufactura ('+rc+' rechazada'+(rc===1?'':'s')+')':'',tl?tl+' en taller':'',ic?ic+' inspección de corte':''].filter(Boolean).join(' · ');}
-      else if(E.k==='Corte')linea2=fmt(re.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0))+' prendas cortadas (liquidación)';
+      if(E.k==='Corte')linea2=fmt(re.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0))+' prendas cortadas (liquidación)';
       else if(E.k==='Encajado'){var u=re.slice().sort(function(a,b){return a.fecha<b.fecha?1:-1;})[0];linea2='Último reporte: '+u.detalle;}
       else if(E.k==='Pedido')linea2=re[0].detalle;
       else linea2=re.length+' registro(s)';}
     if(pr.length){var fp=pr.map(function(e){return e.fecha;}).sort(),ff=pr.map(function(e){return e.fin||e.fecha;}).sort();
       var tx='Programado '+(fp[0]===ff[ff.length-1]?fCorta(fp[0]):fCorta(fp[0])+' al '+fCorta(ff[ff.length-1]));
       if(!re.length){linea1=tx;ir=fp[0];}else linea2=(linea2?linea2+' · ':'')+tx;}
-    if(ms.length){var tot=ms.reduce(function(a,e){return a+(Number(e.cantidad)||0);},0),mm={};ms.forEach(function(e){mm[e.fecha.slice(0,7)]=1;});
-      linea1=fmt(tot)+' segundas';linea2='Registradas en '+Object.keys(mm).sort().map(function(k){return MESES[+k.slice(5,7)-1].toLowerCase()+' '+k.slice(0,4);}).join(', ');ir=ms[0].fecha;}
-    var nada=!l.length,est=nada?'nada':((re.length||ms.length)?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    var nada=!l.length,est=nada?'nada':(re.length?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
     h+='<div class="paso '+est+'" style="--c:'+E.c+';--t:'+rgba(E.c,.09)+'"'+(ir?' data-ir="'+ir+'"':'')+'><span class="ic">'+ic+'</span><div class="pn" style="color:'+(nada?'#9AAAA5':oscuro(E.c))+'">'+esc(E.n)+'</div>'+
       '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div></div>';
   });
@@ -1205,6 +1168,7 @@ function aplicarQ(v,saltar){
   S.q=String(v||'').trim().toUpperCase();$('fQ').value=S.q;cerrarSug();S.sel=null;
   if(saltar&&/^\d{4,6}$/.test(S.q)){
     rpc('ruta',{q:S.q}).then(function(r){
+      if(r)r.eventos=soloEt(r.eventos);
       if(r&&r.eventos&&r.eventos.length){var re=r.eventos.filter(function(e){return e.fecha<=HOY&&e.clase==='real';});
         var f=(re.length?re[re.length-1]:r.eventos[0]).fecha;var d=dISO(f);S.y=d.getFullYear();S.m=d.getMonth();S.sel=f;S.vista='mes';marcarVista();}
       cargar();
@@ -1247,7 +1211,6 @@ function iniciar(){
     var m=e.target.closest('.mcard[data-m]');if(m&&!m.classList.contains('vacio')){S.vista='mes';S.m=+m.dataset.m;S.sel=null;marcarVista();cargar();}});
   $('calCuerpo').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var t=e.target.closest('[data-d],[data-m]');if(t){e.preventDefault();t.click();}}});
   $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
-  $('segCuerpo').addEventListener('click',function(e){var it=e.target.closest('tr[data-op]');if(it){aplicarQ(it.dataset.op,true);window.scrollTo({top:0,behavior:'smooth'});}});
   $('rFlujo').addEventListener('click',function(e){var p=e.target.closest('.paso[data-ir]');if(p)irA(p.dataset.ir);});
   leerHash();marcarVista();
   [].forEach.call($('chips').children,function(b){b.classList.toggle('off',!!S.off[b.dataset.k]);});
@@ -1272,19 +1235,11 @@ window.RUTA={
   filtro:filtroTxt,
   detalle:function(){
     if(S.vista==='mes')return Promise.resolve(S.ev);
-    var p=filtros();p.desde=S.y+'-01-01';p.hasta=S.y+'-12-31';return rpc('eventos',p);
+    var p=filtros();p.desde=S.y+'-01-01';p.hasta=S.y+'-12-31';return rpc('eventos',p).then(soloEt);
   },
   ruta:function(){return unaOP()?S.ruta:null;},
   etapas:ETAPAS
 };
-/* v2.4: en PC las segundas van dentro del calendario (se desplazan con él); en celular y tablet, debajo como antes */
-(function(){
-  var mq=window.matchMedia('(min-width:1101px) and (min-height:560px)');
-  function ubicar(){var sg=document.getElementById('pSeg'),cs=document.getElementById('calScroll'),ap=document.getElementById('app');if(!sg||!cs||!ap)return;
-    if(mq.matches){if(sg.parentNode!==cs)cs.appendChild(sg);}else if(sg.parentNode!==ap)ap.appendChild(sg);}
-  if(mq.addEventListener)mq.addEventListener('change',ubicar);else if(mq.addListener)mq.addListener(ubicar);
-  ubicar();
-})();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar);else iniciar();
 })();
 </script>
@@ -3297,28 +3252,22 @@ var RUT={
   pone:function(){boton(document.getElementById('rtXls'),true,'btn',RUT.exporta);},
   exporta:function(){
     var R=window.RUTA,per=R.periodo(),fil=R.filtro(),lbl=per+(fil?' · '+fil:'');
-    var TIPO={real:'Registrado',programa:'Programado',mes:'Registro mensual'};
+    var TIPO={real:'Registrado',programa:'Programado'};
     return R.detalle().then(function(ev){
       ev=ev||[];if(!ev.length)throw new Error('no hay registros con estos filtros en '+per);
       var res=[],et={};
-      ev.forEach(function(e){var o=et[e.etapa]=et[e.etapa]||{r:0,ro:{},p:0,po:{},m:0,mo:{},c:0};
-        if(e.clase==='real'){o.r++;o.ro[e.op]=1;}else if(e.clase==='programa'){o.p++;o.po[e.op]=1;}else{o.m++;o.mo[e.op]=1;o.c+=Number(e.cantidad)||0;}});
+      ev.forEach(function(e){var o=et[e.etapa]=et[e.etapa]||{r:0,ro:{},p:0,po:{}};
+        if(e.clase==='real'){o.r++;o.ro[e.op]=1;}else if(e.clase==='programa'){o.p++;o.po[e.op]=1;}});
       var todas={},reales={},progs={};ev.forEach(function(e){todas[e.op]=1;if(e.clase==='real')reales[e.op]=1;if(e.clase==='programa')progs[e.op]=1;});
       res.push({titulo:'Resumen — '+lbl,nota:'Una OP se cuenta una sola vez por fila aunque tenga varios registros. Los programas y registros que duran varios días cuentan en el período si alguno de sus días cae en él.',
         columnas:[{campo:'k',titulo:'Concepto',tipo:'texto'},{campo:'v',titulo:'OPs',tipo:'entero'}],
         filas:[{k:'OPs con algún registro o programa',v:Object.keys(todas).length},{k:'OPs con registro real',v:Object.keys(reales).length},{k:'OPs con programa',v:Object.keys(progs).length}]});
       var orden=R.etapas.map(function(x){return x.k;});
-      res.push({titulo:'Por etapa',nota:'Registros = cantidad de registros de cada herramienta. Las segundas se registran por mes (sin día).',
+      res.push({titulo:'Por etapa',nota:'Registros = cantidad de registros de cada herramienta.',
         columnas:[{campo:'k',titulo:'Etapa',tipo:'texto'},{campo:'r',titulo:'Registros reales',tipo:'entero'},{campo:'ro',titulo:'OPs con registro',tipo:'entero'},
-          {campo:'p',titulo:'Programas',tipo:'entero'},{campo:'po',titulo:'OPs con programa',tipo:'entero'},{campo:'m',titulo:'Registros mensuales',tipo:'entero'},{campo:'c',titulo:'Segundas (cantidad)',tipo:'entero'}],
+          {campo:'p',titulo:'Programas',tipo:'entero'},{campo:'po',titulo:'OPs con programa',tipo:'entero'}],
         filas:orden.filter(function(k){return et[k];}).map(function(k){var o=et[k];
-          return {k:k,r:o.r||null,ro:Object.keys(o.ro).length||null,p:o.p||null,po:Object.keys(o.po).length||null,m:o.m||null,c:o.m?o.c:null};})});
-      var au=ev.filter(function(e){return e.fuente==='Auditorías de Calidad Manufactura'&&e.resultado;});
-      if(au.length){var tp={};au.forEach(function(e){var o=tp[e.titulo]=tp[e.titulo]||{n:0,r:0};o.n++;if(/RECHAZ/i.test(e.resultado))o.r++;});
-        var fa=Object.keys(tp).map(function(k){return {k:k,n:tp[k].n,r:tp[k].r,p:tp[k].n?tp[k].r/tp[k].n:null};}),tn=au.length,tr=au.filter(function(e){return /RECHAZ/i.test(e.resultado);}).length;
-        fa.push({k:'Total',n:tn,r:tr,p:tn?tr/tn:null,__total:true});
-        res.push({titulo:'Auditorías de Calidad Manufactura con OP',nota:'% rechazadas = rechazadas ÷ auditorías con resultado (sobre el total, no promediando porcentajes). Solo las auditorías que tienen la OP escrita.',
-          columnas:[{campo:'k',titulo:'Tipo',tipo:'texto'},{campo:'n',titulo:'Auditorías',tipo:'entero'},{campo:'r',titulo:'Rechazadas',tipo:'entero'},{campo:'p',titulo:'% rechazadas',tipo:'porcentaje'}],filas:fa});}
+          return {k:k,r:o.r||null,ro:Object.keys(o.ro).length||null,p:o.p||null,po:Object.keys(o.po).length||null};})});
       var ru=R.ruta();
       if(ru&&ru.eventos&&ru.eventos.length)res.push({titulo:'Ruta completa de la OP '+ru.op.op+' — '+[ru.op.cliente,ru.op.grupo,ru.op.estilo].filter(Boolean).join(' · '),
         nota:'Todos los registros y programas de la OP, de todas las fechas.',
@@ -3326,7 +3275,7 @@ var RUT={
         filas:ru.eventos.map(function(e){return {f:fechaLocal(e.fecha),h:e.fecha_fin?fechaLocal(e.fecha_fin):null,e:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad)};})});
       var det=ev.slice().sort(function(a,b){return String(a.fecha).localeCompare(String(b.fecha))||String(a.op).localeCompare(String(b.op));}).map(function(e){
         return {f:fechaLocal(e.fecha),h:e.fin?fechaLocal(e.fin):null,op:e.op,g:e.grupo||null,es:e.estilo||null,co:e.color||null,et:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad),r:e.resultado||null,fu:e.fuente};});
-      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, liquidación e inspección de corte, programas de costura y acabados, auditorías, fotos de taller, encajado y segundas.',
+      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, liquidación de corte, programas de corte, costura, acabados y despacho, y encajado.',
         origen:'Ruta de la OP',resumen:res,
         detalle:{congelarCols:3,nota:'Una fila por registro o programa del período, con los filtros de la pantalla.',filas:det,columnas:[
           {campo:'f',titulo:'Fecha',tipo:'fecha'},{campo:'h',titulo:'Hasta',tipo:'fecha'},{campo:'op',titulo:'OP',tipo:'alfanumerico'},{campo:'g',titulo:'Grupo',tipo:'alfanumerico'},{campo:'es',titulo:'Estilo',tipo:'alfanumerico'},
