@@ -714,8 +714,21 @@ input.q::placeholder{color:#8A9A95;}
 .paso .pn{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .paso .pr{font-size:13px;font-weight:700;margin-top:4px;color:#333;}
 .paso .pp{font-size:11.5px;color:var(--stone);margin-top:2px;}
+.paso .pq{font-size:11.5px;font-weight:700;color:#333;margin-top:5px;}
 .tscroll{max-height:560px;overflow:auto;}
-@media(min-width:1101px){#pDia{position:sticky;top:96px;align-self:start;max-height:calc(100vh - 110px);display:flex;flex-direction:column;}#diaCuerpo{overflow:auto;flex:1;min-height:0;padding-right:4px;}}
+/* v2.5 (12/11/2026): el detalle del día sale en una ventana emergente; el calendario ocupa todo el ancho */
+#diaVent{position:fixed;inset:0;background:rgba(14,59,54,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:3vh 3vw;}
+#diaVent.show{display:flex;}
+#pDia{width:min(780px,100%);max-height:94vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+#pDia .dvTop{display:flex;justify-content:flex-end;margin:-6px 0 10px;flex:none;}
+#pDia .pt,#pDia .ph{flex:none;}
+#pDia .ph:empty{display:none;}
+#diaCuerpo{overflow:auto;flex:1;min-height:0;padding-right:4px;}
+body.conDia{overflow:hidden;}#calTit{display:none;}
+@media(min-width:601px){.cal .pls{display:flex;flex-wrap:wrap;gap:3px 4px;margin-top:3px;}.cal .pls .pl{margin-top:0;max-width:100%;}.cal .pls .mas{margin-top:0;align-self:center;}}
+@media(min-width:601px) and (max-width:1500px){.cal .pl .pg{display:none;}.cal .pls{gap:2px 4px;margin-top:2px;}.cal .d{padding:3px 6px;}}
+@media(max-width:700px){#diaVent{padding:0;}#pDia{width:100%;height:100%;max-height:none;border-radius:0;}}
+@media print{#diaVent{display:none!important;}}
 .err{background:#FBE9E9;border:1px solid var(--rose);border-radius:8px;padding:12px 16px;color:var(--rose);font-size:13px;margin-bottom:14px;display:none;}
 .err .btn{margin-left:10px;}
 table{width:100%;border-collapse:collapse;font-size:12.5px;}
@@ -851,8 +864,10 @@ tr:hover td{background:var(--warm-light);}
   .wrap>.bar,.wrap>.err,.wrap>#pRuta{flex:none;}
   #gCal{flex:1 1 0;min-height:380px;grid-template-rows:minmax(0,1fr);}
   #pCal{display:flex;flex-direction:column;min-height:0;}
-  #calScroll{flex:1 1 0;min-height:0;overflow:auto;padding-right:4px;}
-  #pDia{position:relative;top:auto;align-self:stretch;max-height:none;min-height:0;}
+  #calScroll{flex:1 1 0;min-height:0;overflow:auto;padding-right:4px;display:flex;flex-direction:column;}
+  #calCuerpo{flex:1 0 auto;display:flex;flex-direction:column;}
+  #calCuerpo>.cal{flex:1 0 auto;grid-template-rows:max-content;grid-auto-rows:minmax(84px,auto);align-content:stretch;}
+  #calCuerpo>.cal .d{min-height:0;}
   #calScroll .cal{overflow:visible;}
   #calScroll .cal .dn{position:sticky;top:0;z-index:3;}
 }
@@ -892,15 +907,19 @@ tr:hover td{background:var(--warm-light);}
   <div class="kpis" id="kpis" style="display:none"></div>
 
   <div class="grid" id="gCal">
-    <div class="panel col8" id="pCal">
+    <div class="panel col12" id="pCal">
       <span class="tira volumen"></span>
       <div class="pt" id="calTit">Calendario</div>
       <div class="ph" id="calSub"></div>
       <div class="ley" id="ley" style="display:none"></div>
       <div id="calScroll"><div id="calCuerpo"></div></div>
     </div>
-    <div class="panel col4" id="pDia">
+  </div>
+
+  <div class="modal" id="diaVent" role="dialog" aria-modal="true" aria-label="Detalle del día">
+    <div class="panel" id="pDia">
       <span class="tira"></span>
+      <div class="dvTop"><button type="button" class="btn" id="diaX">✕ Cerrar</button></div>
       <div class="pt" id="diaTit">Día</div>
       <div class="ph" id="diaSub"></div>
       <div class="dia" id="diaCuerpo"></div>
@@ -919,6 +938,7 @@ tr:hover td{background:var(--warm-light);}
 var SB_URL='https://xxfufpddgoyhbotjmaiy.supabase.co', SB_KEY='sb_publishable_1g-n6UT70EUlNAo8Lyc04w_jKR4LpXZ';
 var ETAPAS=[
   {k:'Pedido',c:'#5F726C',n:'OP creada'},
+  {k:'Tela',c:'#2F6FB5',n:'Tela'},
   {k:'Corte',c:'#B45309',n:'Corte'},
   {k:'Costura',c:'#10B981',n:'Costura'},
   {k:'Acabados',c:'#F59E0B',n:'Acabados'},
@@ -995,8 +1015,8 @@ function pintar(){
   $('perTxt').textContent=S.vista==='mes'?(MESES[S.m]+' '+S.y):String(S.y);
   pintarRuta();
   $('kpis').innerHTML='';$('kpis').style.display='none';
-  if(S.vista==='mes'){pintarMes();pintarDia();}
-  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';}
+  if(S.vista==='mes'){pintarMes();}
+  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();}
   var cs=$('calScroll'),kk=S.vista+'|'+S.y+'|'+S.m+'|'+S.q;if(cs&&cs.dataset.k!==kk){cs.scrollTop=0;cs.dataset.k=kk;}
   guardarHash();
 }
@@ -1032,7 +1052,7 @@ function pintarKpis(){
 function unaOP(){return S.ruta&&S.ruta.op&&S.q===S.ruta.op.op;}
 
 function pintarMes(){
-  $('pCal').className='panel col8';$('pDia').style.display='';
+  $('pCal').className='panel col12';
   $('calTit').textContent='Calendario de '+MESES[S.m].toLowerCase()+' '+S.y;
   var nOps={};S.ev.forEach(function(e){if(e.clase!=='mes')nOps[e.op]=1;});
   $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'En cada día: cuántas OPs distintas tienen registro (color lleno) o programa (borde punteado) en cada etapa.')+
@@ -1075,9 +1095,9 @@ function celda(ev){
   var l=Object.keys(g).map(function(k){var x=g[k];x.n=Object.keys(x.ops).length;return x;})
     .sort(function(a,b){return a.p-b.p||ORDEN[a.e]-ORDEN[b.e];}),h2='',mx=8;
   l.slice(0,mx).forEach(function(x,j){var c=COL[x.e];
-    h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?' prog.':'')+'</span></div>';});
+    h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?'<span class="pg"> prog.</span>':'')+'</span></div>';});
   if(l.length>mx)h2+='<div class="mas">+'+(l.length-mx)+' más</div>';
-  return h2;
+  return '<div class="pls">'+h2+'</div>';
 }
 
 function selInicial(){
@@ -1086,6 +1106,9 @@ function selInicial(){
   if(HOY>=r.desde&&HOY<=r.hasta){S.sel=HOY;return;}
   var ks=Object.keys(S.porDia).sort();S.sel=ks.length?ks[0]:r.desde;
 }
+function abrirDia(){pintarDia();$('diaVent').classList.add('show');document.body.classList.add('conDia');$('diaCuerpo').scrollTop=0;try{$('diaX').focus();}catch(e){}}
+function cerrarDia(){var v=$('diaVent');if(!v.classList.contains('show'))return;v.classList.remove('show');document.body.classList.remove('conDia');
+  var c=S.sel&&document.querySelector('.cal .d[data-d="'+S.sel+'"]');if(c)try{c.focus({preventScroll:true});}catch(e){}}
 function pintarDia(){
   selInicial();
   var k=S.sel,ev=(S.porDia[k]||[]).slice();
@@ -1132,6 +1155,7 @@ function pintarAnio(){
 }
 
 /* ---------- ruta de una OP ---------- */
+var SITQ={Tela:['girado','giradas'],Corte:['cortado','cortadas'],Costura:['confeccionadas','confeccionadas'],Encajado:['encajadas','encajadas'],Despacho:['despachadas','despachadas']};
 function pintarRuta(){
   var p=$('pRuta');
   if(!unaOP()){p.style.display='none';return;}
@@ -1153,9 +1177,13 @@ function pintarRuta(){
     if(pr.length){var fp=pr.map(function(e){return e.fecha;}).sort(),ff=pr.map(function(e){return e.fin||e.fecha;}).sort();
       var tx='Programado '+(fp[0]===ff[ff.length-1]?fCorta(fp[0]):fCorta(fp[0])+' al '+fCorta(ff[ff.length-1]));
       if(!re.length){linea1=tx;ir=fp[0];}else linea2=(linea2?linea2+' · ':'')+tx;}
-    var nada=!l.length,est=nada?'nada':(re.length?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    /* cantidad a la fecha, de Programa PCP · Situación de OP (sin fecha: no va al calendario) */
+    var sit=S.ruta.situacion,cq=SITQ[E.k],vq=sit&&cq?Number(sit[cq[0]]):NaN,linea3='';
+    if(isFinite(vq)&&(vq>0||l.length)){linea3=fmt(vq)+' '+cq[1]+(Number(sit.requeridas)>0?' de '+fmt(sit.requeridas)+' requeridas':'')+(sit.al?' · al '+fCorta(sit.al).slice(0,5):'');}
+    var nada=!l.length&&!(vq>0),est=nada?'nada':((re.length||vq>0)?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    if(!l.length&&!nada)linea1='Sin fecha registrada';
     h+='<div class="paso '+est+'" style="--c:'+E.c+';--t:'+rgba(E.c,.09)+'"'+(ir?' data-ir="'+ir+'"':'')+'><span class="ic">'+ic+'</span><div class="pn" style="color:'+(nada?'#9AAAA5':oscuro(E.c))+'">'+esc(E.n)+'</div>'+
-      '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div></div>';
+      '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div>'+(linea3?'<div class="pq">'+esc(linea3)+'</div>':'')+'</div>';
   });
   $('rFlujo').innerHTML=h;
 }
@@ -1207,10 +1235,13 @@ function iniciar(){
   $('sug').addEventListener('mousedown',function(e){var d=e.target.closest('div[data-op]');if(d){e.preventDefault();aplicarQ(d.dataset.op,true);}});
   document.addEventListener('click',function(e){if(!e.target.closest('.qwrap'))cerrarSug();});
   $('calCuerpo').addEventListener('click',function(e){
-    var d=e.target.closest('.d[data-d],.pb[data-d]');if(d){S.sel=d.dataset.d;pintarDia();if(window.matchMedia('(max-width:1100px)').matches)$('pDia').scrollIntoView({behavior:'smooth',block:'start'});return;}
+    var d=e.target.closest('.d[data-d],.pb[data-d]');if(d){S.sel=d.dataset.d;abrirDia();return;}
     var m=e.target.closest('.mcard[data-m]');if(m&&!m.classList.contains('vacio')){S.vista='mes';S.m=+m.dataset.m;S.sel=null;marcarVista();cargar();}});
   $('calCuerpo').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var t=e.target.closest('[data-d],[data-m]');if(t){e.preventDefault();t.click();}}});
-  $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
+  $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){cerrarDia();aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
+  $('diaX').onclick=cerrarDia;
+  $('diaVent').addEventListener('click',function(e){if(e.target===this)cerrarDia();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')cerrarDia();});
   $('rFlujo').addEventListener('click',function(e){var p=e.target.closest('.paso[data-ir]');if(p)irA(p.dataset.ir);});
   leerHash();marcarVista();
   [].forEach.call($('chips').children,function(b){b.classList.toggle('off',!!S.off[b.dataset.k]);});
@@ -3275,7 +3306,7 @@ var RUT={
         filas:ru.eventos.map(function(e){return {f:fechaLocal(e.fecha),h:e.fecha_fin?fechaLocal(e.fecha_fin):null,e:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad)};})});
       var det=ev.slice().sort(function(a,b){return String(a.fecha).localeCompare(String(b.fecha))||String(a.op).localeCompare(String(b.op));}).map(function(e){
         return {f:fechaLocal(e.fecha),h:e.fin?fechaLocal(e.fin):null,op:e.op,g:e.grupo||null,es:e.estilo||null,co:e.color||null,et:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad),r:e.resultado||null,fu:e.fuente};});
-      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, liquidación de corte, programas de corte, costura, acabados y despacho, y encajado.',
+      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, tela girada y paños y XFTY de Programa PCP, liquidación de corte, programas de corte, costura, acabados y despacho, y encajado.',
         origen:'Ruta de la OP',resumen:res,
         detalle:{congelarCols:3,nota:'Una fila por registro o programa del período, con los filtros de la pantalla.',filas:det,columnas:[
           {campo:'f',titulo:'Fecha',tipo:'fecha'},{campo:'h',titulo:'Hasta',tipo:'fecha'},{campo:'op',titulo:'OP',tipo:'alfanumerico'},{campo:'g',titulo:'Grupo',tipo:'alfanumerico'},{campo:'es',titulo:'Estilo',tipo:'alfanumerico'},
