@@ -715,7 +715,19 @@ input.q::placeholder{color:#8A9A95;}
 .paso .pr{font-size:13px;font-weight:700;margin-top:4px;color:#333;}
 .paso .pp{font-size:11.5px;color:var(--stone);margin-top:2px;}
 .tscroll{max-height:560px;overflow:auto;}
-@media(min-width:1101px){#pDia{position:sticky;top:96px;align-self:start;max-height:calc(100vh - 110px);display:flex;flex-direction:column;}#diaCuerpo{overflow:auto;flex:1;min-height:0;padding-right:4px;}}
+/* v2.5 (12/11/2026): el detalle del día sale en una ventana emergente; el calendario ocupa todo el ancho */
+#diaVent{position:fixed;inset:0;background:rgba(14,59,54,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:3vh 3vw;}
+#diaVent.show{display:flex;}
+#pDia{width:min(780px,100%);max-height:94vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+#pDia .dvTop{display:flex;justify-content:flex-end;margin:-6px 0 10px;flex:none;}
+#pDia .pt,#pDia .ph{flex:none;}
+#pDia .ph:empty{display:none;}
+#diaCuerpo{overflow:auto;flex:1;min-height:0;padding-right:4px;}
+body.conDia{overflow:hidden;}
+@media(min-width:601px){.cal .pls{display:flex;flex-wrap:wrap;gap:3px 4px;margin-top:3px;}.cal .pls .pl{margin-top:0;max-width:100%;}.cal .pls .mas{margin-top:0;align-self:center;}}
+@media(min-width:601px) and (max-width:1500px){.cal .pl .pg{display:none;}}
+@media(max-width:700px){#diaVent{padding:0;}#pDia{width:100%;height:100%;max-height:none;border-radius:0;}}
+@media print{#diaVent{display:none!important;}}
 .err{background:#FBE9E9;border:1px solid var(--rose);border-radius:8px;padding:12px 16px;color:var(--rose);font-size:13px;margin-bottom:14px;display:none;}
 .err .btn{margin-left:10px;}
 table{width:100%;border-collapse:collapse;font-size:12.5px;}
@@ -851,8 +863,10 @@ tr:hover td{background:var(--warm-light);}
   .wrap>.bar,.wrap>.err,.wrap>#pRuta{flex:none;}
   #gCal{flex:1 1 0;min-height:380px;grid-template-rows:minmax(0,1fr);}
   #pCal{display:flex;flex-direction:column;min-height:0;}
-  #calScroll{flex:1 1 0;min-height:0;overflow:auto;padding-right:4px;}
-  #pDia{position:relative;top:auto;align-self:stretch;max-height:none;min-height:0;}
+  #calScroll{flex:1 1 0;min-height:0;overflow:auto;padding-right:4px;display:flex;flex-direction:column;}
+  #calCuerpo{flex:1 0 auto;display:flex;flex-direction:column;}
+  #calCuerpo>.cal{flex:1 0 auto;grid-template-rows:max-content;grid-auto-rows:minmax(84px,auto);align-content:stretch;}
+  #calCuerpo>.cal .d{min-height:0;}
   #calScroll .cal{overflow:visible;}
   #calScroll .cal .dn{position:sticky;top:0;z-index:3;}
 }
@@ -892,15 +906,19 @@ tr:hover td{background:var(--warm-light);}
   <div class="kpis" id="kpis" style="display:none"></div>
 
   <div class="grid" id="gCal">
-    <div class="panel col8" id="pCal">
+    <div class="panel col12" id="pCal">
       <span class="tira volumen"></span>
       <div class="pt" id="calTit">Calendario</div>
       <div class="ph" id="calSub"></div>
       <div class="ley" id="ley" style="display:none"></div>
       <div id="calScroll"><div id="calCuerpo"></div></div>
     </div>
-    <div class="panel col4" id="pDia">
+  </div>
+
+  <div class="modal" id="diaVent" role="dialog" aria-modal="true" aria-label="Detalle del día">
+    <div class="panel" id="pDia">
       <span class="tira"></span>
+      <div class="dvTop"><button type="button" class="btn" id="diaX">✕ Cerrar</button></div>
       <div class="pt" id="diaTit">Día</div>
       <div class="ph" id="diaSub"></div>
       <div class="dia" id="diaCuerpo"></div>
@@ -995,8 +1013,8 @@ function pintar(){
   $('perTxt').textContent=S.vista==='mes'?(MESES[S.m]+' '+S.y):String(S.y);
   pintarRuta();
   $('kpis').innerHTML='';$('kpis').style.display='none';
-  if(S.vista==='mes'){pintarMes();pintarDia();}
-  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();$('pDia').style.display='none';}
+  if(S.vista==='mes'){pintarMes();}
+  else{$('kpis').innerHTML='';$('kpis').style.display='none';pintarAnio();}
   var cs=$('calScroll'),kk=S.vista+'|'+S.y+'|'+S.m+'|'+S.q;if(cs&&cs.dataset.k!==kk){cs.scrollTop=0;cs.dataset.k=kk;}
   guardarHash();
 }
@@ -1032,7 +1050,7 @@ function pintarKpis(){
 function unaOP(){return S.ruta&&S.ruta.op&&S.q===S.ruta.op.op;}
 
 function pintarMes(){
-  $('pCal').className='panel col8';$('pDia').style.display='';
+  $('pCal').className='panel col12';
   $('calTit').textContent='Calendario de '+MESES[S.m].toLowerCase()+' '+S.y;
   var nOps={};S.ev.forEach(function(e){if(e.clase!=='mes')nOps[e.op]=1;});
   $('calSub').textContent=(unaOP()?'Cada recuadro es un registro o un programa de la OP '+S.q+'.':'En cada día: cuántas OPs distintas tienen registro (color lleno) o programa (borde punteado) en cada etapa.')+
@@ -1075,9 +1093,9 @@ function celda(ev){
   var l=Object.keys(g).map(function(k){var x=g[k];x.n=Object.keys(x.ops).length;return x;})
     .sort(function(a,b){return a.p-b.p||ORDEN[a.e]-ORDEN[b.e];}),h2='',mx=8;
   l.slice(0,mx).forEach(function(x,j){var c=COL[x.e];
-    h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?' prog.':'')+'</span></div>';});
+    h2+='<div class="pl'+(x.p?' prog':'')+'" style="animation-delay:'+(j*35)+'ms;'+(x.p?'border-color:'+c+';color:'+oscuro(c):'background:'+rgba(c,.15)+';color:'+oscuro(c))+'" title="'+esc(NOM[x.e]+(x.p?' programado':'')+': '+x.n+' OP')+'"><b>'+x.n+'</b><span class="tx">'+esc(NOM[x.e])+(x.p?'<span class="pg"> prog.</span>':'')+'</span></div>';});
   if(l.length>mx)h2+='<div class="mas">+'+(l.length-mx)+' más</div>';
-  return h2;
+  return '<div class="pls">'+h2+'</div>';
 }
 
 function selInicial(){
@@ -1086,6 +1104,9 @@ function selInicial(){
   if(HOY>=r.desde&&HOY<=r.hasta){S.sel=HOY;return;}
   var ks=Object.keys(S.porDia).sort();S.sel=ks.length?ks[0]:r.desde;
 }
+function abrirDia(){pintarDia();$('diaVent').classList.add('show');document.body.classList.add('conDia');$('diaCuerpo').scrollTop=0;try{$('diaX').focus();}catch(e){}}
+function cerrarDia(){var v=$('diaVent');if(!v.classList.contains('show'))return;v.classList.remove('show');document.body.classList.remove('conDia');
+  var c=S.sel&&document.querySelector('.cal .d[data-d="'+S.sel+'"]');if(c)try{c.focus({preventScroll:true});}catch(e){}}
 function pintarDia(){
   selInicial();
   var k=S.sel,ev=(S.porDia[k]||[]).slice();
@@ -1207,10 +1228,13 @@ function iniciar(){
   $('sug').addEventListener('mousedown',function(e){var d=e.target.closest('div[data-op]');if(d){e.preventDefault();aplicarQ(d.dataset.op,true);}});
   document.addEventListener('click',function(e){if(!e.target.closest('.qwrap'))cerrarSug();});
   $('calCuerpo').addEventListener('click',function(e){
-    var d=e.target.closest('.d[data-d],.pb[data-d]');if(d){S.sel=d.dataset.d;pintarDia();if(window.matchMedia('(max-width:1100px)').matches)$('pDia').scrollIntoView({behavior:'smooth',block:'start'});return;}
+    var d=e.target.closest('.d[data-d],.pb[data-d]');if(d){S.sel=d.dataset.d;abrirDia();return;}
     var m=e.target.closest('.mcard[data-m]');if(m&&!m.classList.contains('vacio')){S.vista='mes';S.m=+m.dataset.m;S.sel=null;marcarVista();cargar();}});
   $('calCuerpo').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var t=e.target.closest('[data-d],[data-m]');if(t){e.preventDefault();t.click();}}});
-  $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
+  $('diaCuerpo').addEventListener('click',function(e){var it=e.target.closest('.it[data-op]');if(it){cerrarDia();aplicarQ(it.dataset.op,false);window.scrollTo({top:0,behavior:'smooth'});}});
+  $('diaX').onclick=cerrarDia;
+  $('diaVent').addEventListener('click',function(e){if(e.target===this)cerrarDia();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')cerrarDia();});
   $('rFlujo').addEventListener('click',function(e){var p=e.target.closest('.paso[data-ir]');if(p)irA(p.dataset.ir);});
   leerHash();marcarVista();
   [].forEach.call($('chips').children,function(b){b.classList.toggle('off',!!S.off[b.dataset.k]);});
