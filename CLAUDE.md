@@ -3,7 +3,7 @@
 Las reglas generales de trabajo están en el repo privado `lives-instrucciones` (CLAUDE.md). Este archivo solo describe esta herramienta.
 
 ## Qué hace
-`index.html` es un **calendario de OPs** de solo lectura: junta lo **registrado** (real) y lo **programado** de todas las herramientas LIVES, por etapa: Pedido (OP creada), Corte, Costura, Acabados, Encajado y Despacho. Desde el 12/11/2026 ya no muestra Auditorías ni Segundas (pedido de Christian): la pantalla las descarta, aunque siguen en `ruta_op_ev`.
+`index.html` es un **calendario de OPs** de solo lectura: junta lo **registrado** (real) y lo **programado** de todas las herramientas LIVES, por etapa: Pedido (OP creada), Tela, Corte, Costura, Acabados, Encajado y Despacho. Desde el 12/11/2026 ya no muestra Auditorías ni Segundas (pedido de Christian): la pantalla las descarta, aunque siguen en `ruta_op_ev`.
 - Barra superior: búsqueda (OP, grupo, estilo o PO) con sugerencias desde 3 caracteres, cliente, Mes/Año, ‹ ›, Hoy y chips para prender o apagar etapas. El enlace se puede compartir (`#q=…&cliente=…&m=YYYY-MM`).
 - Vista Mes: grilla lunes a domingo con las OP distintas por etapa (relleno = real, borde punteado = programado). El calendario ocupa todo el ancho y, en PC, el mes entra en la pantalla (en pantallas de hasta 1500 px de ancho las pastillas de programa no escriben "prog.": se distinguen por el borde punteado). Al tocar un día se abre una ventana emergente con sus registros (hasta 500), con ✕ Cerrar, Esc o clic afuera; en celular ocupa toda la pantalla. Tocar una OP en la ventana la cierra y muestra su ruta (desde el 12/11/2026; antes era un panel "Día" al costado, o abajo en celular).
 - Vista Año: 12 tarjetas con barras por etapa, comparadas contra el mes con más OP de esa etapa.
@@ -13,6 +13,7 @@ Las reglas generales de trabajo están en el repo privado `lives-instrucciones` 
 ## Base de datos (Supabase lives-datos)
 - Una sola puerta: `ruta_op(p_accion, p)` con las acciones `eventos` (por rango de fechas), `meses` (por año), `ruta` (una OP), `buscar` y `clientes`.
 - Lee `ruta_op_ev` y `ruta_op_info`, y `cat_clientes` para el selector de cliente. Los eventos que se muestran vienen de la base de OPs, la liquidación de corte, los programas de costura y acabados y el avance de encajado. La tabla también trae auditorías (Calidad Manufactura, fotos de taller, inspección de corte) y segundas, que la pantalla no muestra.
+- Desde el 12/11/2026 (registro `Ro01`) también lee Programa PCP · Situación de OP (`sop_v_op`): la vista `ruta_op_ev` suma la etapa **Tela** (real: «Tela girada», «Paños enviados» y «Paños recibidos», en la primera y la última fecha de cada color) y el **XFTY** de cada OP dentro de Despacho (programado); la acción `ruta` devuelve además `situacion` (requeridas, girado, cortado, habilitadas, confeccionadas, encajadas y despachadas a la fecha de la carga), que la pantalla escribe en cada etapa de la ruta («647 cortadas de 900 requeridas · al 12/11»). Esas cantidades no tienen fecha, por eso no van al calendario. Depende de que `sop_situacion` esté cargada al día. Respaldos para volver atrás: vista `respaldo_ruta_op_ev_20261112` y tabla `respaldo_ruta_op_funciones_20261112`.
 - No usa Storage. No guarda nada.
 
 ## Quién la usa

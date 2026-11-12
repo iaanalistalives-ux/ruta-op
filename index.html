@@ -714,6 +714,7 @@ input.q::placeholder{color:#8A9A95;}
 .paso .pn{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .paso .pr{font-size:13px;font-weight:700;margin-top:4px;color:#333;}
 .paso .pp{font-size:11.5px;color:var(--stone);margin-top:2px;}
+.paso .pq{font-size:11.5px;font-weight:700;color:#333;margin-top:5px;}
 .tscroll{max-height:560px;overflow:auto;}
 /* v2.5 (12/11/2026): el detalle del día sale en una ventana emergente; el calendario ocupa todo el ancho */
 #diaVent{position:fixed;inset:0;background:rgba(14,59,54,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:3vh 3vw;}
@@ -723,9 +724,9 @@ input.q::placeholder{color:#8A9A95;}
 #pDia .pt,#pDia .ph{flex:none;}
 #pDia .ph:empty{display:none;}
 #diaCuerpo{overflow:auto;flex:1;min-height:0;padding-right:4px;}
-body.conDia{overflow:hidden;}
+body.conDia{overflow:hidden;}#calTit{display:none;}
 @media(min-width:601px){.cal .pls{display:flex;flex-wrap:wrap;gap:3px 4px;margin-top:3px;}.cal .pls .pl{margin-top:0;max-width:100%;}.cal .pls .mas{margin-top:0;align-self:center;}}
-@media(min-width:601px) and (max-width:1500px){.cal .pl .pg{display:none;}}
+@media(min-width:601px) and (max-width:1500px){.cal .pl .pg{display:none;}.cal .pls{gap:2px 4px;margin-top:2px;}.cal .d{padding:3px 6px;}}
 @media(max-width:700px){#diaVent{padding:0;}#pDia{width:100%;height:100%;max-height:none;border-radius:0;}}
 @media print{#diaVent{display:none!important;}}
 .err{background:#FBE9E9;border:1px solid var(--rose);border-radius:8px;padding:12px 16px;color:var(--rose);font-size:13px;margin-bottom:14px;display:none;}
@@ -937,6 +938,7 @@ tr:hover td{background:var(--warm-light);}
 var SB_URL='https://xxfufpddgoyhbotjmaiy.supabase.co', SB_KEY='sb_publishable_1g-n6UT70EUlNAo8Lyc04w_jKR4LpXZ';
 var ETAPAS=[
   {k:'Pedido',c:'#5F726C',n:'OP creada'},
+  {k:'Tela',c:'#2F6FB5',n:'Tela'},
   {k:'Corte',c:'#B45309',n:'Corte'},
   {k:'Costura',c:'#10B981',n:'Costura'},
   {k:'Acabados',c:'#F59E0B',n:'Acabados'},
@@ -1153,6 +1155,7 @@ function pintarAnio(){
 }
 
 /* ---------- ruta de una OP ---------- */
+var SITQ={Tela:['girado','giradas'],Corte:['cortado','cortadas'],Costura:['confeccionadas','confeccionadas'],Encajado:['encajadas','encajadas'],Despacho:['despachadas','despachadas']};
 function pintarRuta(){
   var p=$('pRuta');
   if(!unaOP()){p.style.display='none';return;}
@@ -1174,9 +1177,13 @@ function pintarRuta(){
     if(pr.length){var fp=pr.map(function(e){return e.fecha;}).sort(),ff=pr.map(function(e){return e.fin||e.fecha;}).sort();
       var tx='Programado '+(fp[0]===ff[ff.length-1]?fCorta(fp[0]):fCorta(fp[0])+' al '+fCorta(ff[ff.length-1]));
       if(!re.length){linea1=tx;ir=fp[0];}else linea2=(linea2?linea2+' · ':'')+tx;}
-    var nada=!l.length,est=nada?'nada':(re.length?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    /* cantidad a la fecha, de Programa PCP · Situación de OP (sin fecha: no va al calendario) */
+    var sit=S.ruta.situacion,cq=SITQ[E.k],vq=sit&&cq?Number(sit[cq[0]]):NaN,linea3='';
+    if(isFinite(vq)&&(vq>0||l.length)){linea3=fmt(vq)+' '+cq[1]+(Number(sit.requeridas)>0?' de '+fmt(sit.requeridas)+' requeridas':'')+(sit.al?' · al '+fCorta(sit.al).slice(0,5):'');}
+    var nada=!l.length&&!(vq>0),est=nada?'nada':((re.length||vq>0)?'real':'prog'),ic=nada?'–':(est==='real'?'✓':'◷');
+    if(!l.length&&!nada)linea1='Sin fecha registrada';
     h+='<div class="paso '+est+'" style="--c:'+E.c+';--t:'+rgba(E.c,.09)+'"'+(ir?' data-ir="'+ir+'"':'')+'><span class="ic">'+ic+'</span><div class="pn" style="color:'+(nada?'#9AAAA5':oscuro(E.c))+'">'+esc(E.n)+'</div>'+
-      '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div></div>';
+      '<div class="pr">'+(nada?'Sin registro':esc(linea1))+'</div><div class="pp">'+esc(linea2)+'</div>'+(linea3?'<div class="pq">'+esc(linea3)+'</div>':'')+'</div>';
   });
   $('rFlujo').innerHTML=h;
 }
@@ -3299,7 +3306,7 @@ var RUT={
         filas:ru.eventos.map(function(e){return {f:fechaLocal(e.fecha),h:e.fecha_fin?fechaLocal(e.fecha_fin):null,e:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad)};})});
       var det=ev.slice().sort(function(a,b){return String(a.fecha).localeCompare(String(b.fecha))||String(a.op).localeCompare(String(b.op));}).map(function(e){
         return {f:fechaLocal(e.fecha),h:e.fin?fechaLocal(e.fin):null,op:e.op,g:e.grupo||null,es:e.estilo||null,co:e.color||null,et:e.etapa,t:TIPO[e.clase]||e.clase,q:e.titulo,d:e.detalle||null,c:numero(e.cantidad),r:e.resultado||null,fu:e.fuente};});
-      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, liquidación de corte, programas de corte, costura, acabados y despacho, y encajado.',
+      return libro({titulo:'Ruta de la OP',sub:lbl,formula:'Registros y programas de todas las herramientas LIVES que tienen la OP: base de OPs, tela girada y paños y XFTY de Programa PCP, liquidación de corte, programas de corte, costura, acabados y despacho, y encajado.',
         origen:'Ruta de la OP',resumen:res,
         detalle:{congelarCols:3,nota:'Una fila por registro o programa del período, con los filtros de la pantalla.',filas:det,columnas:[
           {campo:'f',titulo:'Fecha',tipo:'fecha'},{campo:'h',titulo:'Hasta',tipo:'fecha'},{campo:'op',titulo:'OP',tipo:'alfanumerico'},{campo:'g',titulo:'Grupo',tipo:'alfanumerico'},{campo:'es',titulo:'Estilo',tipo:'alfanumerico'},
